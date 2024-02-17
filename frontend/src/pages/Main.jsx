@@ -5,8 +5,8 @@ import { PresentationChartBarIcon, ScaleIcon, UsersIcon } from "@heroicons/react
 
 function Main() {
   return (
-    <div className="flex">
-      <Card className="h-screen w-full max-w-[18rem] p-4 shadow-xl shadow-blue-gray-900/5">
+    <div className="flex h-full">
+      <Card className="h-full w-full max-w-[18rem] p-4">
         <div className="px-4 pt-4 pb-2">
           <Typography color="blue-gray" variant="h2" className="font-bold leading-[1]">
             <div>CONTROL</div>
