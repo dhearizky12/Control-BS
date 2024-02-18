@@ -1,7 +1,7 @@
 import React from "react";
 import { Outlet, NavLink } from "react-router-dom";
 import { Card, Typography, List, ListItem, ListItemPrefix } from "@material-tailwind/react";
-import { PresentationChartBarIcon, ScaleIcon, UsersIcon } from "@heroicons/react/24/solid";
+import { PresentationChartBarIcon, ScaleIcon, BeakerIcon, ViewfinderCircleIcon } from "@heroicons/react/24/outline";
 
 function Main() {
   return (
@@ -23,12 +23,20 @@ function Main() {
               Dashboard
             </ListItem>
           </NavLink>
-          <NavLink to="/shift" className={({ isActive }) => (isActive ? "[&>div]:bg-blue-gray-100/50 [&>div]:text-blue-gray-900 " : "")}>
+          <NavLink to="/target" className={({ isActive }) => (isActive ? "[&>div]:bg-blue-gray-100/50 [&>div]:text-blue-gray-900 " : "")}>
             <ListItem className="font-bold">
               <ListItemPrefix>
-                <UsersIcon className="h-5 w-5" />
+                <ViewfinderCircleIcon className="h-5 w-5" />
               </ListItemPrefix>
-              Shift
+              Target
+            </ListItem>
+          </NavLink>
+          <NavLink to="/production" className={({ isActive }) => (isActive ? "[&>div]:bg-blue-gray-100/50 [&>div]:text-blue-gray-900 " : "")}>
+            <ListItem className="font-bold">
+              <ListItemPrefix>
+                <BeakerIcon className="h-5 w-5" />
+              </ListItemPrefix>
+              Production
             </ListItem>
           </NavLink>
           <NavLink to="/grammage" className={({ isActive }) => (isActive ? "[&>div]:bg-blue-gray-100/50 [&>div]:text-blue-gray-900 " : "")}>

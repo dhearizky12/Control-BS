@@ -1,8 +1,9 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import UserList from "./components/User/UserList";
-import Grammage from './pages/Grammage'
 import Main from "./pages/Main";
 import Dashboard from "./pages/Dashboard";
+import Production from "./pages/Production";
+import Target from "./pages/Target";
+import Grammage from "./pages/Grammage";
 
 function App() {
   return (
@@ -10,8 +11,9 @@ function App() {
       <Routes>
         <Route path="/" element={<Main />}>
           <Route index element={<Dashboard />} />
-          <Route path="/shift" element={<UserList />} />
-          <Route path="/grammage" element={<Grammage/>} />
+          <Route path="/target" element={<Target />} />
+          <Route path="/production" element={<Production />} />
+          <Route path="/grammage" element={<Grammage />}/>
         </Route>
       </Routes>
     </BrowserRouter>
