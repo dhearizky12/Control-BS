@@ -6,7 +6,7 @@ import { PresentationChartBarIcon, ScaleIcon, UsersIcon } from "@heroicons/react
 function Main() {
   return (
     <div className="flex h-full">
-      <Card className="h-full w-full max-w-[18rem] p-4">
+      <Card className="h-full w-full max-w-[18rem] p-4 rounded-none">
         <div className="px-4 pt-4 pb-2">
           <Typography color="blue-gray" variant="h2" className="font-bold leading-[1]">
             <div>CONTROL</div>
@@ -15,7 +15,7 @@ function Main() {
         </div>
         <hr className="my-2 border-blue-gray-50" />
         <List className="">
-          <NavLink to="/" className={({ isActive }) => (isActive && "[&>div]:bg-blue-gray-100/50 [&>div]:text-blue-gray-900 ")}>
+          <NavLink to="/" className={({ isActive }) => (isActive ? "[&>div]:bg-blue-gray-100/50 [&>div]:text-blue-gray-900 " : "")}>
             <ListItem className="font-bold">
               <ListItemPrefix>
                 <PresentationChartBarIcon className="h-5 w-5 !text-blue-gray-900" />
@@ -23,7 +23,7 @@ function Main() {
               Dashboard
             </ListItem>
           </NavLink>
-          <NavLink to="/shift" className={({ isActive }) => (isActive && "[&>div]:bg-blue-gray-100/50 [&>div]:text-blue-gray-900 ")}>
+          <NavLink to="/shift" className={({ isActive }) => (isActive ? "[&>div]:bg-blue-gray-100/50 [&>div]:text-blue-gray-900 " : "")}>
             <ListItem className="font-bold">
               <ListItemPrefix>
                 <UsersIcon className="h-5 w-5" />
@@ -31,7 +31,7 @@ function Main() {
               Shift
             </ListItem>
           </NavLink>
-          <NavLink to="/grammage" className={({ isActive }) => (isActive && "[&>div]:bg-blue-gray-100/50 [&>div]:text-blue-gray-900 ")}>
+          <NavLink to="/grammage" className={({ isActive }) => (isActive ? "[&>div]:bg-blue-gray-100/50 [&>div]:text-blue-gray-900 " : "")}>
             <ListItem className="font-bold">
               <ListItemPrefix>
                 <ScaleIcon className="h-5 w-5" />

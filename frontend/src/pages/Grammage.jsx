@@ -1,127 +1,167 @@
-import React from "react";
-import { Card, CardBody, Typography } from "@material-tailwind/react";
-import ChartView from "../components/Chart";
+import React, { memo, useEffect, useRef } from "react";
+import { Card, Typography } from "@material-tailwind/react";
 
 function Grammage(props) {
+  const TABLE_HEAD = useRef(["Waktu", "Shift 1", "Shift 2", "Shift 3", "Shift 4", "Average"]);
+  const TABLE_FOOT = useRef(["Average", "70 Gram", "70 Gram", "70 Gram", "70 Gram", "70 Gram"]);
+
+  const TABLE_ROWS = [
+    {
+      dateTime: "06:00",
+      shift1: 70,
+      shift2: 70,
+      shift3: 70,
+      shift4: 70,
+      average: 70,
+    },
+    {
+      dateTime: "07:00",
+      shift1: 70,
+      shift2: 70,
+      shift3: 70,
+      shift4: 70,
+      average: 70,
+    },
+    {
+      dateTime: "08:00",
+      shift1: 70,
+      shift2: 70,
+      shift3: 70,
+      shift4: 70,
+      average: 70,
+    },
+    {
+      dateTime: "09:00",
+      shift1: 70,
+      shift2: 70,
+      shift3: 70,
+      shift4: 70,
+      average: 70,
+    },
+    {
+      dateTime: "10:00",
+      shift1: 70,
+      shift2: 70,
+      shift3: 70,
+      shift4: 70,
+      average: 70,
+    },
+    {
+      dateTime: "11:00",
+      shift1: 70,
+      shift2: 70,
+      shift3: 70,
+      shift4: 70,
+      average: 70,
+    },
+    {
+      dateTime: "13:00",
+      shift1: 70,
+      shift2: 70,
+      shift3: 70,
+      shift4: 70,
+      average: 70,
+    },
+    {
+      dateTime: "14:00",
+      shift1: 70,
+      shift2: 70,
+      shift3: 70,
+      shift4: 70,
+      average: 70,
+    },
+    {
+      dateTime: "15:00",
+      shift1: 70,
+      shift2: 70,
+      shift3: 70,
+      shift4: 70,
+      average: 70,
+    },
+    {
+      dateTime: "16:00",
+      shift1: 70,
+      shift2: 70,
+      shift3: 70,
+      shift4: 70,
+      average: 70,
+    },
+    {
+      dateTime: "17:00",
+      shift1: 70,
+      shift2: 70,
+      shift3: 70,
+      shift4: 70,
+      average: 70,
+    },
+  ];
+
+  useEffect(() => {}, []);
+
   return (
-    <div className="h-full py-4 px-8 flex flex-col gap-4">
-      <div>
+    <div className="h-full flex flex-col">
+      <div className="py-4 px-8">
         <div className="text-gray-700">Tanggal</div>
         <div className="font-bold text-3xl">08 Februari 2024</div>
       </div>
-      <div className="flex-1 w-full grid grid-cols-4 gap-4">
-        <div className="col-span-3">
-          <ChartView />
-        </div>
-        <div className="h-full flex flex-col gap-4">
-          <Card color="gray" variant="gradient" shadow={false} className="border flex-1">
-            <CardBody className="py-4 h-full flex flex-col justify-between">
-              <Typography variant="h6" className="font-bold">
-                Nama Produk
-              </Typography>
-              <div>
-                <Typography className="font-bold flex gap-2 items-end">
-                  <div className="text-4xl">Giv Biru</div>
+      <div className="flex-1 w-full overflow-hidden pb-4 px-8">
+        <Card className="h-full w-full overflow-hidden flex flex-col">
+          <div className="grid grid-cols-6 bg-black border-b border-blue-gray-100 ">
+            {TABLE_HEAD.current.map((head) => (
+              <div key={head} className="p-4">
+                <Typography variant="small" color="white" className="font-bold leading-none text-md">
+                  {head}
                 </Typography>
               </div>
-            </CardBody>
-          </Card>
-          <Card color="gray" variant="gradient" shadow={false} className="border flex-1">
-            <CardBody className="py-4 h-full flex flex-col justify-between">
-              <Typography variant="h6" className="font-bold">
-                Target Produksi
-              </Typography>
-              <div>
-                <Typography className="font-bold flex gap-2 items-end">
-                  <div className="text-4xl">4000</div>
-                  <div className="text-lg">Box</div>
+            ))}
+          </div>
+          <div className="overflow-y-auto gutter-stable">
+            {TABLE_ROWS.map(({ dateTime, shift1, shift2, shift3, shift4, average }, index) => {
+              return (
+                <div key={index} className="grid grid-cols-6 [&>div]:p-4 [&>div]:border-b [&>div]:border-blue-gray-50 -mr-[17px]">
+                  <div>
+                    <Typography variant="small" color="blue-gray" className="font-bold">
+                      {dateTime}
+                    </Typography>
+                  </div>
+                  <div>
+                    <Typography variant="small" color="blue-gray" className="font-normal">
+                      {shift1} Gram
+                    </Typography>
+                  </div>
+                  <div>
+                    <Typography variant="small" color="blue-gray" className="font-normal">
+                      {shift2} Gram
+                    </Typography>
+                  </div>
+                  <div>
+                    <Typography variant="small" color="blue-gray" className="font-normal">
+                      {shift3} Gram
+                    </Typography>
+                  </div>
+                  <div>
+                    <Typography variant="small" color="blue-gray" className="font-normal">
+                      {shift4} Gram
+                    </Typography>
+                  </div>
+                  <div className="p-4 border-b !border-white bg-blue-gray-50">
+                    <Typography variant="small" color="blue-gray" className="font-normal">
+                      {average} Gram
+                    </Typography>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div className="grid grid-cols-6">
+            {TABLE_FOOT.current.map((foot, index) => (
+              <div key={index + "-foot"} className="border-b border-blue-gray-100 bg-black py-4 pr-4 pl-[15px]">
+                <Typography variant="small" color="white" className="font-bold leading-none text-md">
+                  {foot}
                 </Typography>
               </div>
-            </CardBody>
-          </Card>
-          <Card color="gray" variant="gradient" shadow={false} className="border flex-1">
-            <CardBody className="py-4 h-full flex flex-col justify-between">
-              <Typography variant="h6" className="font-bold">
-                Hasil Produksi
-              </Typography>
-              <div>
-                <Typography className="font-bold flex gap-2 items-end">
-                  <div className="text-4xl">3000</div>
-                  <div className="text-lg">Box</div>
-                </Typography>
-              </div>
-            </CardBody>
-          </Card>
-          <Card color="gray" variant="gradient" shadow={false} className="border flex-1">
-            <CardBody className="py-4 h-full flex flex-col justify-between">
-              <Typography variant="h6" className="font-bold">
-                Waste Sabun
-              </Typography>
-              <div>
-                <Typography className="font-bold flex gap-2 items-end">
-                  <div className="text-4xl">3</div>
-                  <div className="text-lg">Kg</div>
-                </Typography>
-              </div>
-            </CardBody>
-          </Card>
-        </div>
-      </div>
-      <div className="grid grid-cols-5 gap-4">
-        <Card shadow={false} className="border flex-1">
-          <CardBody className="h-full text-center">
-            <Typography variant="h6" className="font-bold">
-              Kurang Produksi
-            </Typography>
-            <Typography color="blue-gray" className="font-bold flex gap-2 items-end justify-center mt-3">
-              <div className="text-5xl">1000</div>
-              <div className="text-lg">Box</div>
-            </Typography>
-          </CardBody>
-        </Card>
-        <Card shadow={false} className="border flex-1">
-          <CardBody className="h-full text-center">
-            <Typography variant="h6" className="font-bold">
-              Hasil Adukan
-            </Typography>
-            <Typography color="blue-gray" className="font-bold flex gap-2 items-end justify-center mt-3">
-              <div className="text-5xl">30</div>
-              <div className="text-lg">X</div>
-            </Typography>
-          </CardBody>
-        </Card>
-        <Card shadow={false} className="border flex-1">
-          <CardBody className="h-full text-center">
-            <Typography variant="h6" className="font-bold">
-              Kurang Adukan
-            </Typography>
-            <Typography color="blue-gray" className="font-bold flex gap-2 items-end justify-center mt-3">
-              <div className="text-5xl">10</div>
-              <div className="text-lg">X</div>
-            </Typography>
-          </CardBody>
-        </Card>
-        <Card shadow={false} className="border flex-1">
-          <CardBody className="h-full text-center">
-            <Typography variant="h6" className="font-bold">
-              Penambahan BS
-            </Typography>
-            <Typography color="blue-gray" className="font-bold flex gap-2 items-end justify-center mt-3">
-              <div className="text-5xl">10</div>
-              <div className="text-lg">Kg</div>
-            </Typography>
-          </CardBody>
-        </Card>
-        <Card shadow={false} className="border flex-1">
-          <CardBody className="h-full text-center">
-            <Typography variant="h6" className="font-bold">
-              Stagnasi Adukan
-            </Typography>
-            <Typography color="blue-gray" className="font-bold flex gap-2 items-end justify-center mt-3">
-              <div className="text-5xl">10</div>
-              <div className="text-lg">Kg</div>
-            </Typography>
-          </CardBody>
+            ))}
+          </div>
         </Card>
       </div>
     </div>
@@ -130,4 +170,4 @@ function Grammage(props) {
 
 Grammage.propTypes = {};
 
-export default Grammage;
+export default memo(Grammage);
