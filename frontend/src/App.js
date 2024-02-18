@@ -1,7 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import UserList from "./components/User/UserList";
-import AddUser from "./components/User/AddUser";
-import EditUser from "./components/User/EditUser";
+import Grammage from './pages/Grammage'
 import Main from "./pages/Main";
 import Dashboard from "./pages/Dashboard";
 
@@ -12,10 +11,8 @@ function App() {
         <Route path="/" element={<Main />}>
           <Route index element={<Dashboard />} />
           <Route path="/shift" element={<UserList />} />
-          <Route path="/gramasi" element={<UserList />} />
+          <Route path="/grammage" element={<Grammage/>} />
         </Route>
-        <Route path="/users/add" element={<AddUser />} />
-        <Route path="/users/edit/:id" element={<EditUser />} />
       </Routes>
     </BrowserRouter>
   );

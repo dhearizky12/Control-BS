@@ -31,7 +31,7 @@ function Main() {
               Shift
             </ListItem>
           </NavLink>
-          <NavLink to="/gramasi" className={({ isActive }) => (isActive && "[&>div]:bg-blue-gray-100/50 [&>div]:text-blue-gray-900 ")}>
+          <NavLink to="/grammage" className={({ isActive }) => (isActive && "[&>div]:bg-blue-gray-100/50 [&>div]:text-blue-gray-900 ")}>
             <ListItem className="font-bold">
               <ListItemPrefix>
                 <ScaleIcon className="h-5 w-5" />
