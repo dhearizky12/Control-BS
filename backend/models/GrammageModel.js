@@ -1,22 +1,43 @@
 import { Sequelize } from "sequelize";
 import db from "../config/Database.js";
+import Shift from "./ShiftModel.js";
 
 const { DataTypes } = Sequelize;
 
 const Grammage = db.define(
   "grammages",
   {
-    name: DataTypes.STRING,
-    email: DataTypes.STRING,
-    gender: DataTypes.STRING,
+    sample1: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    sample2: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    sample3: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    sample4: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    average: {
+      type: DataTypes.VIRTUAL,
+      get() {
+        return (this.sample1 + this.sample2 + this.sample3 + this.sample4) / 4;
+      },
+    },
   },
   {
     freezeTableName: true,
   }
 );
 
-export default Grammage;
+Shift.hasMany(Grammage);
+Grammage.belongsTo(Shift);
 
-(async () => {
-  await db.sync();
-})();
+Grammage.sync();
+
+export default Grammage;

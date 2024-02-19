@@ -1,8 +1,11 @@
 import Grammage from "../models/GrammageModel.js";
+import Shift from "../models/ShiftModel.js";
 
 export const getGrammages = async (req, res) => {
   try {
-    const response = await Grammage.findAll();
+    const response = await Grammage.findAll({
+      include: Shift,
+    });
     res.status(200).json(response);
   } catch (error) {
     console.log(error.message);
@@ -15,6 +18,7 @@ export const getGrammagesById = async (req, res) => {
       where: {
         id: req.params.id,
       },
+      include: Shift,
     });
     res.status(200).json(response);
   } catch (error) {

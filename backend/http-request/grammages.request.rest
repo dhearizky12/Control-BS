@@ -1,21 +1,24 @@
 ###
-GET http://localhost:5000/users
+GET http://localhost:3200/grammages
 
 ###
-GET http://localhost:5000/users/1
+GET http://localhost:3200/grammages/1
 
 ###
-POST http://localhost:5000/users
+POST http://localhost:3200/grammages
 Content-Type: application/json
 
 {
-    "name" : "John Doe",
-    "email" : "john@gmail.com",
-    "gender" : "Male"
+    "sample1" : 70,
+    "sample2" : 70,
+    "sample3" : 70,
+    "sample4" : 70,
+    "averate" : 70,
+    "shiftId" : 1
 }
 
 ###
-PATCH http://localhost:5000/users/1
+PATCH http://localhost:3200/grammages/1
 Content-Type: application/json
 
 {
@@ -25,4 +28,4 @@ Content-Type: application/json
 }
 
 ###
-DELETE http://localhost:5000/users/2
+DELETE http://localhost:3200/grammages/2

@@ -1,0 +1,32 @@
+###
+GET http://localhost:3200/productions
+
+###
+GET http://localhost:3200/productions/1
+
+###
+POST http://localhost:3200/productions
+Content-Type: application/json
+
+{
+    "group" : 1,
+    "mixResult" : 70,
+    "additionBS" : 10,
+    "grammage" : 70,
+    "result" : 200,
+    "waste" : 5,
+    "shiftId": 1
+}
+
+###
+PATCH http://localhost:3200/productions/1
+Content-Type: application/json
+
+{
+    "name" : "Dhea Fiky",
+    "email" : "dhea@gmail.com",
+    "gender" : "Female"
+}
+
+###
+DELETE http://localhost:3200/productions/2

@@ -1,10 +1,10 @@
 import dotenv from "dotenv";
 import path from "path";
 
-dotenv.config({ path: [".env.development", ".env"] });
+dotenv.config({ path: [".env.development.local", ".env"] });
 const envVars = process.env;
 
-const config = {
+const Config = {
   env: envVars.NODE_ENV,
   port: envVars.PORT,
   sequelize: {
@@ -16,4 +16,4 @@ const config = {
   },
 };
 
-export default config;
+export default Config;

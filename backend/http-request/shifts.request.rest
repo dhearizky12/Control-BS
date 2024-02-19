@@ -1,0 +1,26 @@
+###
+GET http://localhost:3200/shifts
+
+###
+GET http://localhost:3200/shifts/1
+
+###
+POST http://localhost:3200/shifts
+Content-Type: application/json
+
+{
+    "time" :  72000000,
+    "name" : "Shift 15"
+}
+
+###
+PATCH http://localhost:3200/shifts/1
+Content-Type: application/json
+
+{
+    "time" :  72000000,
+    "name" : "Shift 15"
+}
+
+###
+DELETE http://localhost:3200/shifts/2
