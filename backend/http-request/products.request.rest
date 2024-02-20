@@ -1,11 +1,11 @@
 ###
-GET http://localhost:3200/products
+GET http://localhost:3200/api/products
 
 ###
-GET http://localhost:3200/products/1
+GET http://localhost:3200/api/products/1
 
 ###
-POST http://localhost:3200/products
+POST http://localhost:3200/api/products
 Content-Type: application/json
 
 {
@@ -13,7 +13,7 @@ Content-Type: application/json
 }
 
 ###
-PATCH http://localhost:3200/products/1
+PATCH http://localhost:3200/api/products/1
 Content-Type: application/json
 
 {
@@ -21,4 +21,4 @@ Content-Type: application/json
 }
 
 ###
-DELETE http://localhost:3200/products/2
+DELETE http://localhost:3200/api/products/2

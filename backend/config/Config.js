@@ -7,6 +7,7 @@ const envVars = process.env;
 const Config = {
   env: envVars.NODE_ENV,
   port: envVars.PORT,
+  publicFolder: envVars.PUBLIC_FOLDER,
   sequelize: {
     host: envVars.SEQUELIZE_HOST,
     dialect: envVars.SEQUELIZE_DIALECT,

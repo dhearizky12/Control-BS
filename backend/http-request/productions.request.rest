@@ -1,11 +1,11 @@
 ###
-GET http://localhost:3200/productions
+GET http://localhost:3200/api/productions
 
 ###
-GET http://localhost:3200/productions/1
+GET http://localhost:3200/api/productions/1
 
 ###
-POST http://localhost:3200/productions
+POST http://localhost:3200/api/productions
 Content-Type: application/json
 
 {
@@ -20,7 +20,7 @@ Content-Type: application/json
 }
 
 ###
-PATCH http://localhost:3200/productions/1
+PATCH http://localhost:3200/api/productions/1
 Content-Type: application/json
 
 {
@@ -35,4 +35,4 @@ Content-Type: application/json
 }
 
 ###
-DELETE http://localhost:3200/productions/2
+DELETE http://localhost:3200/api/productions/2

@@ -1,11 +1,11 @@
 ###
-GET http://localhost:3200/shifts
+GET http://localhost:3200/api/shifts
 
 ###
-GET http://localhost:3200/shifts/1
+GET http://localhost:3200/api/shifts/1
 
 ###
-POST http://localhost:3200/shifts
+POST http://localhost:3200/api/shifts
 Content-Type: application/json
 
 {
@@ -14,7 +14,7 @@ Content-Type: application/json
 }
 
 ###
-PATCH http://localhost:3200/shifts/1
+PATCH http://localhost:3200/api/shifts/1
 Content-Type: application/json
 
 {
@@ -23,4 +23,4 @@ Content-Type: application/json
 }
 
 ###
-DELETE http://localhost:3200/shifts/2
+DELETE http://localhost:3200/api/shifts/2

@@ -1,11 +1,11 @@
 ###
-GET http://localhost:3200/groups
+GET http://localhost:3200/api/groups
 
 ###
-GET http://localhost:3200/groups/1
+GET http://localhost:3200/api/groups/1
 
 ###
-POST http://localhost:3200/groups
+POST http://localhost:3200/api/groups
 Content-Type: application/json
 
 {
@@ -13,7 +13,7 @@ Content-Type: application/json
 }
 
 ###
-PATCH http://localhost:3200/groups/1
+PATCH http://localhost:3200/api/groups/1
 Content-Type: application/json
 
 {
@@ -21,4 +21,4 @@ Content-Type: application/json
 }
 
 ###
-DELETE http://localhost:3200/groups/2
+DELETE http://localhost:3200/api/groups/2

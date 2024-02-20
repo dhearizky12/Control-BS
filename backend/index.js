@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import path from "path";
 import Config from "./config/Config.js";
 import UserRoute from "./routes/UserRoute.js";
 import ShiftRoute from "./routes/ShiftRoute.js";
@@ -12,12 +13,22 @@ import GrammageRoute from "./routes/GrammageRoute.js";
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(UserRoute);
-app.use(ShiftRoute);
-app.use(GroupRoute);
-app.use(ProductRoute);
-app.use(TargetRoute);
-app.use(ProductionRoute);
-app.use(GrammageRoute);
 
-app.listen(Config.port, () => console.log("Server up and running ... "));
+const apiRouter = express.Router();
+
+apiRouter.use(UserRoute);
+apiRouter.use(ShiftRoute);
+apiRouter.use(GroupRoute);
+apiRouter.use(ProductRoute);
+apiRouter.use(TargetRoute);
+apiRouter.use(ProductionRoute);
+apiRouter.use(GrammageRoute);
+
+app.use('/api', apiRouter);
+
+app.use(express.static(Config.publicFolder));
+app.get("*", function (req, res) {
+  res.sendFile(path.resolve(`${Config.publicFolder}/index.html`));
+});
+
+app.listen(Config.port, () => console.log(`Server up and running on port ${Config.port} ... `));

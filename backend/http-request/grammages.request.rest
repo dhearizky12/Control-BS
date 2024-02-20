@@ -1,11 +1,11 @@
 ###
-GET http://localhost:3200/grammages
+GET http://localhost:3200/api/grammages
 
 ###
-GET http://localhost:3200/grammages/1
+GET http://localhost:3200/api/grammages/1
 
 ###
-POST http://localhost:3200/grammages
+POST http://localhost:3200/api/grammages
 Content-Type: application/json
 
 {
@@ -19,7 +19,7 @@ Content-Type: application/json
 }
 
 ###
-PATCH http://localhost:3200/grammages/1
+PATCH http://localhost:3200/api/grammages/1
 Content-Type: application/json
 
 {
@@ -33,4 +33,4 @@ Content-Type: application/json
 }
 
 ###
-DELETE http://localhost:3200/grammages/2
+DELETE http://localhost:3200/api/grammages/2
