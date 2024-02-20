@@ -7,29 +7,33 @@ const { DataTypes } = Sequelize;
 const Production = db.define(
   "productions",
   {
+    date: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
     group: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
     },
     mixResult: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
     },
     additionBS: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
     },
     grammage: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
     },
     result: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
     },
     waste: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
     },
   },
   {
@@ -37,7 +41,7 @@ const Production = db.define(
   }
 );
 
-Shift.hasMany(Production)
+Shift.hasMany(Production);
 Production.belongsTo(Shift);
 
 Production.sync();

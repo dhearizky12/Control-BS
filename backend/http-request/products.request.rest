@@ -1,0 +1,24 @@
+###
+GET http://localhost:3200/products
+
+###
+GET http://localhost:3200/products/1
+
+###
+POST http://localhost:3200/products
+Content-Type: application/json
+
+{
+    "name" : "Giv Biru"
+}
+
+###
+PATCH http://localhost:3200/products/1
+Content-Type: application/json
+
+{
+    "name" : "Giv Ungu"
+}
+
+###
+DELETE http://localhost:3200/products/2
