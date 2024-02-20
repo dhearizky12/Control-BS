@@ -6,6 +6,7 @@ import Target from "../models/TargetModel.js";
 export const getGrammages = async (req, res) => {
   try {
     const response = await Grammage.findAll({
+      where: req.query,
       include: [Shift, Target],
     });
     res.status(200).json(response);

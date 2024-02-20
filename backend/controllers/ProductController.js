@@ -2,7 +2,9 @@ import Product from "../models/ProductModel.js";
 
 export const getProducts = async (req, res) => {
   try {
-    const response = await Product.findAll();
+    const response = await Product.findAll({
+      where: req.query,
+    });
     res.status(200).json(response);
   } catch (error) {
     console.log(error.message);

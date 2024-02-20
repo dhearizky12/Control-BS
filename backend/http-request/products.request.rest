@@ -2,6 +2,9 @@
 GET http://localhost:3200/api/products
 
 ###
+GET http://localhost:3200/api/products?name=Giv Biru
+
+###
 GET http://localhost:3200/api/products/1
 
 ###

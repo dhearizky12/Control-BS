@@ -2,7 +2,9 @@ import Shift from "../models/ShiftModel.js";
 
 export const getShifts = async (req, res) => {
   try {
-    const response = await Shift.findAll();
+    const response = await Shift.findAll({
+      where: req.query,
+    });
     res.status(200).json(response);
   } catch (error) {
     console.log(error.message);

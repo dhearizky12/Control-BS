@@ -2,7 +2,9 @@ import Group from "../models/GroupModel.js";
 
 export const getGroups = async (req, res) => {
   try {
-    const response = await Group.findAll();
+    const response = await Group.findAll({
+      where: req.query,
+    });
     res.status(200).json(response);
   } catch (error) {
     console.log(error.message);

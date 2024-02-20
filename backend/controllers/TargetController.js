@@ -4,6 +4,7 @@ import Target from "../models/TargetModel.js";
 export const getTargets = async (req, res) => {
   try {
     const response = await Target.findAll({
+      where: req.query,
       include: Product,
     });
     res.status(200).json(response);

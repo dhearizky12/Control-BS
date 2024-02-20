@@ -2,6 +2,9 @@
 GET http://localhost:3200/api/productions
 
 ###
+GET http://localhost:3200/api/productions?groupId=1&shiftId=1&targetId=1
+
+###
 GET http://localhost:3200/api/productions/1
 
 ###

@@ -2,6 +2,9 @@
 GET http://localhost:3200/api/targets
 
 ###
+GET http://localhost:3200/api/targets?mid=PO1234&date=2024-02-15T00:00:00.000Z&target=400
+
+###
 GET http://localhost:3200/api/targets/1
 
 ###

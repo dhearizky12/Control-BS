@@ -6,6 +6,7 @@ import Target from "../models/TargetModel.js";
 export const getProductions = async (req, res) => {
   try {
     const response = await Production.findAll({
+      where: req.query,
       include: [Group, Shift, Target],
     });
     res.status(200).json(response);
