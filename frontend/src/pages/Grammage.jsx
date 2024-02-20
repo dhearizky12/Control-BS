@@ -1,103 +1,46 @@
-import React, { memo, useRef } from "react";
+import React, { memo, useEffect, useRef, useState } from "react";
 import { Card, Typography, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Input, Select, Option } from "@material-tailwind/react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
 function Grammage() {
-  const TABLE_HEAD = useRef(["Waktu", "Sample 1", "Sample 2", "Sample 3", "Sample 4", "Average"]);
-  const TABLE_FOOT = useRef(["Average", "70 Kg", "70 Kg", "70 Kg", "70 Kg", "70 Kg"]);
+  const TABLE_HEAD = useRef(["Waktu Shift", "Sample 1", "Sample 2", "Sample 3", "Sample 4", "Average"]);
 
-  const TABLE_ROWS = [
-    {
-      dateTime: "06:00",
-      sample1: 70,
-      sample2: 70,
-      sample3: 70,
-      sample4: 70,
-      average: 70,
-    },
-    {
-      dateTime: "07:00",
-      sample1: 70,
-      sample2: 70,
-      sample3: 70,
-      sample4: 70,
-      average: 70,
-    },
-    {
-      dateTime: "08:00",
-      sample1: 70,
-      sample2: 70,
-      sample3: 70,
-      sample4: 70,
-      average: 70,
-    },
-    {
-      dateTime: "09:00",
-      sample1: 70,
-      sample2: 70,
-      sample3: 70,
-      sample4: 70,
-      average: 70,
-    },
-    {
-      dateTime: "10:00",
-      sample1: 70,
-      sample2: 70,
-      sample3: 70,
-      sample4: 70,
-      average: 70,
-    },
-    {
-      dateTime: "11:00",
-      sample1: 70,
-      sample2: 70,
-      sample3: 70,
-      sample4: 70,
-      average: 70,
-    },
-    {
-      dateTime: "13:00",
-      sample1: 70,
-      sample2: 70,
-      sample3: 70,
-      sample4: 70,
-      average: 70,
-    },
-    {
-      dateTime: "14:00",
-      sample1: 70,
-      sample2: 70,
-      sample3: 70,
-      sample4: 70,
-      average: 70,
-    },
-    {
-      dateTime: "15:00",
-      sample1: 70,
-      sample2: 70,
-      sample3: 70,
-      sample4: 70,
-      average: 70,
-    },
-    {
-      dateTime: "16:00",
-      sample1: 70,
-      sample2: 70,
-      sample3: 70,
-      sample4: 70,
-      average: 70,
-    },
-    {
-      dateTime: "17:00",
-      sample1: 70,
-      sample2: 70,
-      sample3: 70,
-      sample4: 70,
-      average: 70,
-    },
-  ];
+  const [open, setOpen] = useState(false);
+  const [grammagesData, setGrammagesData] = useState([]);
+  const [averageSample, setAverageSample] = useState([]);
 
-  const [open, setOpen] = React.useState(false);
+  useEffect(() => {
+    fetch("/api/grammages", { method: "GET" })
+      .then((responses) => responses.json())
+      .then((responses) => {
+        let averageSample = [];
+
+        setGrammagesData(
+          responses.map((grammage) => {
+            grammage.shift =
+              new Date(grammage.shift.time).getUTCHours().toString().padStart(2, "0") +
+              ":" +
+              new Date(grammage.shift.time).getUTCMinutes().toString().padStart(2, "0");
+
+            // calculate sample average
+            averageSample[0] = averageSample[0] ? (averageSample[0] + grammage.sample1) / 2 : grammage.sample1;
+            averageSample[1] = averageSample[1] ? (averageSample[1] + grammage.sample2) / 2 : grammage.sample2;
+            averageSample[2] = averageSample[2] ? (averageSample[2] + grammage.sample3) / 2 : grammage.sample3;
+            averageSample[3] = averageSample[3] ? (averageSample[3] + grammage.sample4) / 2 : grammage.sample4;
+            averageSample[4] = averageSample[4] ? (averageSample[4] + grammage.average) / 2 : grammage.average;
+
+            return grammage;
+          })
+        );
+
+        setAverageSample(averageSample);
+      })
+      .catch((error) => {
+        console.error("API Error:", error);
+      });
+
+    return () => {};
+  }, []);
 
   const handleOpen = () => setOpen(!open);
 
@@ -120,43 +63,43 @@ function Grammage() {
           <div className="grid grid-cols-6 bg-black border-b border-blue-gray-100 ">
             {TABLE_HEAD.current.map((head) => (
               <div key={head} className="p-4">
-                <Typography variant="small" color="white" className="font-bold leading-none text-md">
+                <Typography color="white" className="font-bold leading-none text-md">
                   {head}
                 </Typography>
               </div>
             ))}
           </div>
           <div className="overflow-y-auto overflow-x-hidden gutter-stable">
-            {TABLE_ROWS.map(({ dateTime, sample1, sample2, sample3, sample4, average }, index) => {
+            {grammagesData.map(({ shift, sample1, sample2, sample3, sample4, average }, index) => {
               return (
                 <div key={index} className="grid grid-cols-6 [&>div]:p-4 [&>div]:border-b [&>div]:border-blue-gray-50 -mr-[17px]">
                   <div>
-                    <Typography variant="small" color="blue-gray" className="font-bold">
-                      {dateTime}
+                    <Typography color="blue-gray" className="font-bold">
+                      {shift}
                     </Typography>
                   </div>
                   <div>
-                    <Typography variant="small" color="blue-gray" className="font-normal">
+                    <Typography color="blue-gray" className="font-normal">
                       {sample1} Kg
                     </Typography>
                   </div>
                   <div>
-                    <Typography variant="small" color="blue-gray" className="font-normal">
+                    <Typography color="blue-gray" className="font-normal">
                       {sample2} Kg
                     </Typography>
                   </div>
                   <div>
-                    <Typography variant="small" color="blue-gray" className="font-normal">
+                    <Typography color="blue-gray" className="font-normal">
                       {sample3} Kg
                     </Typography>
                   </div>
                   <div>
-                    <Typography variant="small" color="blue-gray" className="font-normal">
+                    <Typography color="blue-gray" className="font-normal">
                       {sample4} Kg
                     </Typography>
                   </div>
                   <div className="p-4 border-b !border-white bg-blue-gray-50">
-                    <Typography variant="small" color="blue-gray" className="font-normal">
+                    <Typography color="blue-gray" className="font-bold">
                       {average} Kg
                     </Typography>
                   </div>
@@ -165,9 +108,14 @@ function Grammage() {
             })}
           </div>
           <div className="grid grid-cols-6">
-            {TABLE_FOOT.current.map((foot, index) => (
+            <div className="border-b border-blue-gray-100 bg-black py-4 pr-4 pl-[15px]">
+              <Typography color="white" className="font-bold leading-none text-md">
+                Average
+              </Typography>
+            </div>
+            {averageSample.map((foot, index) => (
               <div key={index + "-foot"} className="border-b border-blue-gray-100 bg-black py-4 pr-4 pl-[15px]">
-                <Typography variant="small" color="white" className="font-bold leading-none text-md">
+                <Typography color="white" className="font-bold leading-none text-md">
                   {foot}
                 </Typography>
               </div>
