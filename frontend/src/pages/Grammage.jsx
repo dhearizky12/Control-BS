@@ -126,7 +126,7 @@ function Grammage() {
               </div>
             ))}
           </div>
-          <div className="overflow-y-auto gutter-stable">
+          <div className="overflow-y-auto overflow-x-hidden gutter-stable">
             {TABLE_ROWS.map(({ dateTime, sample1, sample2, sample3, sample4, average }, index) => {
               return (
                 <div key={index} className="grid grid-cols-6 [&>div]:p-4 [&>div]:border-b [&>div]:border-blue-gray-50 -mr-[17px]">
