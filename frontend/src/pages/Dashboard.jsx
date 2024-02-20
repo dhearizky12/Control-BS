@@ -19,11 +19,7 @@ function Dashboard(props) {
               <Typography variant="h6" className="font-bold">
                 Nama Produk
               </Typography>
-              <div>
-                <Typography className="font-bold flex gap-2 items-end">
-                  <div className="text-4xl">Giv Biru</div>
-                </Typography>
-              </div>
+              <Typography className="font-bold flex gap-2 items-end text-4xl">Giv Biru</Typography>
             </CardBody>
           </Card>
           <Card color="gray" variant="gradient" shadow={false} className="border flex-1">
@@ -32,10 +28,8 @@ function Dashboard(props) {
                 Target Produksi
               </Typography>
               <div>
-                <Typography className="font-bold flex gap-2 items-end">
-                  <div className="text-4xl">4000</div>
-                  <div className="text-lg">Box</div>
-                </Typography>
+                <Typography className="font-bold text-4xl inline-block mr-2">4000</Typography>
+                <Typography className="font-bold text-lg inline-block">Box</Typography>
               </div>
             </CardBody>
           </Card>
@@ -45,10 +39,8 @@ function Dashboard(props) {
                 Hasil Produksi
               </Typography>
               <div>
-                <Typography className="font-bold flex gap-2 items-end">
-                  <div className="text-4xl">3000</div>
-                  <div className="text-lg">Box</div>
-                </Typography>
+                <Typography className="font-bold text-4xl inline-block mr-2">3000</Typography>
+                <Typography className="font-bold text-lg inline-block">Box</Typography>
               </div>
             </CardBody>
           </Card>
@@ -58,10 +50,8 @@ function Dashboard(props) {
                 Waste Sabun
               </Typography>
               <div>
-                <Typography className="font-bold flex gap-2 items-end">
-                  <div className="text-4xl">3</div>
-                  <div className="text-lg">Kg</div>
-                </Typography>
+                <Typography className="font-bold text-4xl inline-block mr-2">50</Typography>
+                <Typography className="font-bold text-lg inline-block">Kg</Typography>
               </div>
             </CardBody>
           </Card>
@@ -73,10 +63,14 @@ function Dashboard(props) {
             <Typography variant="h6" className="font-bold">
               Kurang Produksi
             </Typography>
-            <Typography color="blue-gray" className="font-bold flex gap-2 items-end justify-center mt-3">
-              <div className="text-5xl">1000</div>
-              <div className="text-lg">Box</div>
-            </Typography>
+            <div>
+              <Typography color="blue-gray" className="font-bold inline-block mr-2 mt-3 text-5xl">
+                1000
+              </Typography>
+              <Typography color="blue-gray" className="font-bold inline-block mt-3 text-lg">
+                Box
+              </Typography>
+            </div>
           </CardBody>
         </Card>
         <Card shadow={false} className="border flex-1">
@@ -84,10 +78,14 @@ function Dashboard(props) {
             <Typography variant="h6" className="font-bold">
               Hasil Adukan
             </Typography>
-            <Typography color="blue-gray" className="font-bold flex gap-2 items-end justify-center mt-3">
-              <div className="text-5xl">30</div>
-              <div className="text-lg">X</div>
-            </Typography>
+            <div>
+              <Typography color="blue-gray" className="font-bold inline-block mr-2 mt-3 text-5xl">
+                30
+              </Typography>
+              <Typography color="blue-gray" className="font-bold inline-block mt-3 text-lg">
+                X
+              </Typography>
+            </div>
           </CardBody>
         </Card>
         <Card shadow={false} className="border flex-1">
@@ -95,10 +93,14 @@ function Dashboard(props) {
             <Typography variant="h6" className="font-bold">
               Kurang Adukan
             </Typography>
-            <Typography color="blue-gray" className="font-bold flex gap-2 items-end justify-center mt-3">
-              <div className="text-5xl">10</div>
-              <div className="text-lg">X</div>
-            </Typography>
+            <div>
+              <Typography color="blue-gray" className="font-bold inline-block mr-2 mt-3 text-5xl">
+                10
+              </Typography>
+              <Typography color="blue-gray" className="font-bold inline-block mt-3 text-lg">
+                X
+              </Typography>
+            </div>
           </CardBody>
         </Card>
         <Card shadow={false} className="border flex-1">
@@ -106,10 +108,14 @@ function Dashboard(props) {
             <Typography variant="h6" className="font-bold">
               Penambahan BS
             </Typography>
-            <Typography color="blue-gray" className="font-bold flex gap-2 items-end justify-center mt-3">
-              <div className="text-5xl">10</div>
-              <div className="text-lg">Kg</div>
-            </Typography>
+            <div>
+              <Typography color="blue-gray" className="font-bold inline-block mr-2 mt-3 text-5xl">
+                10
+              </Typography>
+              <Typography color="blue-gray" className="font-bold inline-block mt-3 text-lg">
+                Kg
+              </Typography>
+            </div>
           </CardBody>
         </Card>
         <Card shadow={false} className="border flex-1">
@@ -117,10 +123,14 @@ function Dashboard(props) {
             <Typography variant="h6" className="font-bold">
               Stagnasi Adukan
             </Typography>
-            <Typography color="blue-gray" className="font-bold flex gap-2 items-end justify-center mt-3">
-              <div className="text-5xl">10</div>
-              <div className="text-lg">Kg</div>
-            </Typography>
+            <div>
+              <Typography color="blue-gray" className="font-bold inline-block mr-2 mt-3 text-5xl">
+                10
+              </Typography>
+              <Typography color="blue-gray" className="font-bold inline-block mt-3 text-lg">
+                Kg
+              </Typography>
+            </div>
           </CardBody>
         </Card>
       </div>

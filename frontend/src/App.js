@@ -16,10 +16,10 @@ function App() {
           <Route index element={<Dashboard />} />
           <Route path="/target" element={<Target />} />
           <Route path="/production" element={<Production />} />
-          <Route path="/grammage" element={<Grammage />}/>
-          <Route path="/master/product" element={<Product />}/>
-          <Route path="/master/group" element={<Group />}/>
-          <Route path="/master/shift" element={<Shift />}/>
+          <Route path="/grammage" element={<Grammage />} />
+          <Route path="/master/product" element={<Product />} />
+          <Route path="/master/group" element={<Group />} />
+          <Route path="/master/shift" element={<Shift />} />
         </Route>
       </Routes>
     </BrowserRouter>

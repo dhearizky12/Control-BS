@@ -89,7 +89,12 @@ const chartConfig = {
 function ChartView() {
   return (
     <Card shadow={false} className="border h-full">
-      <CardHeader floated={false} shadow={false} color="transparent" className="-mb-6 h-[63.19px] flex-shrink-0 pb-2 flex items-center gap-3 rounded-none">
+      <CardHeader
+        floated={false}
+        shadow={false}
+        color="transparent"
+        className="-mb-6 h-[63.19px] flex-shrink-0 pb-2 flex items-center gap-3 rounded-none"
+      >
         <div className="w-max rounded-lg bg-gray-900 p-2 text-white m-1">
           <Square3Stack3DIcon className="h-4 w-4" />
         </div>
@@ -98,10 +103,12 @@ function ChartView() {
         </Typography>
         <div className="pr-2">
           <div>Gramasi Final</div>
-          <Typography color="blue-gray" className="flex items-end justify-end gap-1">
-            <div className="text-4xl font-bold">70</div>
-            <span>Kg</span>
-          </Typography>
+          <div className="flex items-end justify-end gap-1">
+            <Typography color="blue-gray" className="text-4xl font-bold">
+              70
+            </Typography>
+            <Typography color="blue-gray">Kg</Typography>
+          </div>
         </div>
       </CardHeader>
       <CardBody className="h-full pt-0 px-2 pb-0">

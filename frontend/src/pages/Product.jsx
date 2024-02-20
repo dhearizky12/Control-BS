@@ -1,18 +1,23 @@
-import React, { memo } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { Card, Typography, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Input, Select, Option } from "@material-tailwind/react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
 function Product() {
-  const TABLE_ROWS = [
-    {
-      name: "Product 1",
-    },
-    {
-      name: "Product 2",
-    },
-  ];
+  const [open, setOpen] = useState(false);
+  const [productData, setProductData] = useState([]);
 
-  const [open, setOpen] = React.useState(false);
+  useEffect(() => {
+    fetch("/api/products", { method: "GET" })
+      .then((response) => response.json())
+      .then((response) => {
+        setProductData(response);
+      })
+      .catch((error) => {
+        console.error("API Error:", error);
+      });
+
+    return () => {};
+  }, []);
 
   const handleOpen = () => setOpen(!open);
 
@@ -32,35 +37,39 @@ function Product() {
       <div className="flex-1 w-full overflow-hidden pb-4 px-8">
         <Card className="max-h-full h-fit w-full overflow-hidden flex flex-col">
           <div className="flex bg-black border-b border-blue-gray-100 ">
-          <div key="name" className="p-4 flex-1">
-              <Typography variant="small" color="white" className="font-bold leading-none text-md">
+            <div className="p-4 flex-1">
+              <Typography color="white" className="font-bold leading-none text-md">
                 Nama Produk
               </Typography>
             </div>
-            <div key="name" className="p-4 w-[217.89px]">
-              <Typography variant="small" color="white" className="font-bold leading-none text-md">
+            <div className="p-4 w-[217.89px] mr-[17px]">
+              <Typography color="white" className="font-bold leading-none text-md">
                 Aksi
               </Typography>
             </div>
           </div>
           <div className="overflow-y-auto overflow-x-hidden gutter-stable">
-            {TABLE_ROWS.map(({ name }, index) => {
-              return (
-                <div key={index} className="flex [&>div]:p-4 [&>div]:border-b [&>div]:border-blue-gray-50 -mr-[17px]">
-                  <div className="flex-1 flex items-center">
-                    <Typography variant="small" color="blue-gray" className="font-normal">
-                      {name}
-                    </Typography>
+            {productData.length ? (
+              productData.map(({ name }, index) => {
+                return (
+                  <div key={index} className="flex [&>div]:p-4 [&>div]:border-b [&>div]:border-blue-gray-50 -mr-[17px]">
+                    <div className="flex-1 flex items-center">
+                      <Typography color="blue-gray" className="font-normal">
+                        {name}
+                      </Typography>
+                    </div>
+                    <div className="flex gap-3 w-[217.89px] mr-[17px]">
+                      <Button variant="outlined" color="red">
+                        Delete
+                      </Button>
+                      <Button variant="outlined">Edit</Button>
+                    </div>
                   </div>
-                  <div className="flex gap-3 w-[217.89px]">
-                    <Button variant="outlined" color="red">
-                      Delete
-                    </Button>
-                    <Button variant="outlined">Edit</Button>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })
+            ) : (
+              <div className="px-3 py-5 text-center">Data Kosong</div>
+            )}
           </div>
         </Card>
       </div>

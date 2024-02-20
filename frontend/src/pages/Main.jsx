@@ -33,8 +33,10 @@ function Main() {
       <Card className="h-full w-full max-w-[18rem] p-4 rounded-none">
         <div className="px-4 pt-4 pb-2">
           <Typography color="blue-gray" className="text-3xl font-extrabold leading-[1]">
-            <div>CONTROL BS</div>
-            <div>CHANGE OVER</div>
+            CONTROL BS
+          </Typography>
+          <Typography color="blue-gray" className="text-3xl font-extrabold leading-[1]">
+            CHANGE OVER
           </Typography>
         </div>
         <hr className="my-2 border-blue-gray-50" />
