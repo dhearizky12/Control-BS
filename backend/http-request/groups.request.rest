@@ -1,0 +1,24 @@
+###
+GET http://localhost:3200/groups
+
+###
+GET http://localhost:3200/groups/1
+
+###
+POST http://localhost:3200/groups
+Content-Type: application/json
+
+{
+    "name" : "Group 1"
+}
+
+###
+PATCH http://localhost:3200/groups/1
+Content-Type: application/json
+
+{
+    "name" : "Group 2"
+}
+
+###
+DELETE http://localhost:3200/groups/2

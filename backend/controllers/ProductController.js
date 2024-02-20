@@ -21,6 +21,7 @@ export const getProductsById = async (req, res) => {
     console.log(error.message);
   }
 };
+
 export const createProduct = async (req, res) => {
   try {
     await Product.create(req.body);

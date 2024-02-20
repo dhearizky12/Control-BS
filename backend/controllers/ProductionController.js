@@ -1,10 +1,12 @@
 import Production from "../models/ProductionModel.js";
+import Group from "../models/GroupModel.js";
 import Shift from "../models/ShiftModel.js";
+import Target from "../models/TargetModel.js";
 
 export const getProductions = async (req, res) => {
   try {
     const response = await Production.findAll({
-      include: Shift,
+      include: [Group, Shift, Target],
     });
     res.status(200).json(response);
   } catch (error) {
@@ -18,7 +20,7 @@ export const getProductionsById = async (req, res) => {
       where: {
         id: req.params.id,
       },
-      include: Shift,
+      include: [Group, Shift, Target],
     });
     res.status(200).json(response);
   } catch (error) {

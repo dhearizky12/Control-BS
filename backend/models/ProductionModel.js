@@ -1,6 +1,8 @@
 import { Sequelize } from "sequelize";
 import db from "../config/Database.js";
+import Group from "./GroupModel.js";
 import Shift from "./ShiftModel.js";
+import Target from "./TargetModel.js";
 
 const { DataTypes } = Sequelize;
 
@@ -10,10 +12,7 @@ const Production = db.define(
     date: {
       type: DataTypes.DATE,
       allowNull: false,
-    },
-    group: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
+      defaultValue: Sequelize.NOW
     },
     mixResult: {
       type: DataTypes.INTEGER,
@@ -41,8 +40,14 @@ const Production = db.define(
   }
 );
 
+Group.hasMany(Production);
+Production.belongsTo(Group);
+
 Shift.hasMany(Production);
 Production.belongsTo(Shift);
+
+Target.hasMany(Production);
+Production.belongsTo(Target);
 
 Production.sync();
 

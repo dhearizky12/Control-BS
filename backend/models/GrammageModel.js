@@ -1,5 +1,6 @@
 import { Sequelize } from "sequelize";
 import db from "../config/Database.js";
+import Target from "./TargetModel.js";
 import Shift from "./ShiftModel.js";
 
 const { DataTypes } = Sequelize;
@@ -34,6 +35,9 @@ const Grammage = db.define(
     freezeTableName: true,
   }
 );
+
+Target.hasMany(Grammage);
+Grammage.belongsTo(Target);
 
 Shift.hasMany(Grammage);
 Grammage.belongsTo(Shift);

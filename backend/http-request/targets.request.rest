@@ -1,0 +1,30 @@
+###
+GET http://localhost:3200/targets
+
+###
+GET http://localhost:3200/targets/1
+
+###
+POST http://localhost:3200/targets
+Content-Type: application/json
+
+{
+    "mid": "PO1234",
+    "date": "2024-02-15",
+    "target": 400,
+    "productId": 1
+}
+
+###
+PATCH http://localhost:3200/targets/1
+Content-Type: application/json
+
+{
+    "mid": "PO1235",
+    "date": "2024-02-16",
+    "target": 500,
+    "productId": 2
+}
+
+###
+DELETE http://localhost:3200/targets/2

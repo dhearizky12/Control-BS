@@ -14,7 +14,8 @@ Content-Type: application/json
     "sample3" : 70,
     "sample4" : 70,
     "averate" : 70,
-    "shiftId" : 1
+    "shiftId" : 1,
+    "targetId": 1
 }
 
 ###
@@ -22,9 +23,13 @@ PATCH http://localhost:3200/grammages/1
 Content-Type: application/json
 
 {
-    "name" : "Dhea Fiky",
-    "email" : "dhea@gmail.com",
-    "gender" : "Female"
+    "sample1" : 70,
+    "sample2" : 70,
+    "sample3" : 70,
+    "sample4" : 70,
+    "averate" : 70,
+    "shiftId" : 1,
+    "targetId": 2
 }
 
 ###
