@@ -47,16 +47,17 @@ function Shift() {
       setName(data.name);
       setUpdateData(data);
     }
-    
-    if(open){
+
+    if (open) {
       setTime(null);
       setName(null);
+      setUpdateData({});
     }
 
     setOpen(!open);
     setSaveLoading(false);
-
   };
+
   const handleOpenDelete = ({ target }) => {
     if (target && target.dataset.id) {
       var data = shiftData.find((value) => value.id === Number(target.dataset.id));
@@ -80,8 +81,8 @@ function Shift() {
     const utcStartDate = new Date(0);
     const finalTime = new Date(utcStartDate.getTime() + Number(timeSplit[0]) * 60 * 60 * 1000 + Number(timeSplit[1]) * 60 * 1000);
 
-    const url = "/api/shifts" + (updateData ? "/" + updateData.id : "");
-    const method = updateData ? "PATCH" : "POST";
+    const url = "/api/shifts" + (updateData.id ? "/" + updateData.id : "");
+    const method = updateData.id ? "PATCH" : "POST";
 
     setSaveLoading(true);
     fetch(url, {
@@ -132,7 +133,7 @@ function Shift() {
         <div>
           <Button onClick={handleOpen} className="flex items-center gap-2">
             <PlusIcon className="h-5 w-5" />
-            Add Shift
+            Tambah Shift
           </Button>
         </div>
       </div>
@@ -173,10 +174,10 @@ function Shift() {
                     </div>
                     <div className="flex gap-3 w-[217.89px] mr-[17px]">
                       <Button variant="outlined" color="red" data-id={id} onClick={handleOpenDelete}>
-                        Delete
+                        Hapus
                       </Button>
                       <Button variant="outlined" data-id={id} onClick={handleOpen}>
-                        Edit
+                        Ubah
                       </Button>
                     </div>
                   </div>
@@ -198,7 +199,7 @@ function Shift() {
       </div>
 
       <Dialog open={open} handler={handleOpen}>
-        <DialogHeader>{updateData ? "Edit" : "Tambah"} Shift</DialogHeader>
+        <DialogHeader>{updateData.id ? "Ubah" : "Tambah"} Shift</DialogHeader>
         <DialogBody>
           <div className="grid grid-cols-2 gap-4">
             <div className="mb-1">
