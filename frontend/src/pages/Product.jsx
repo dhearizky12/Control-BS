@@ -1,11 +1,18 @@
-import React, { memo, useEffect, useState } from "react";
+import React, { memo, useCallback, useEffect, useState } from "react";
 import { Card, Typography, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Input, Select, Option, Spinner } from "@material-tailwind/react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
 function Product() {
   const [open, setOpen] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
   const [loading, setLoading] = useState(false);
   const [productData, setProductData] = useState([]);
+
+  const [name, setName] = useState("");
+  const [updateData, setUpdateData] = useState({});
+  const [deleteData, setDeleteData] = useState({});
+  const [saveLoading, setSaveLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -22,8 +29,102 @@ function Product() {
 
     return () => {};
   }, []);
+  const onNameChange = ({ target }) => setName(target.value);
 
-  const handleOpen = () => setOpen(!open);
+  const handleGetProductData = useCallback(() => {
+    setLoading(true);
+    fetch("/api/products", { method: "GET" })
+      .then((response) => response.json())
+      .then((response) => {
+        setLoading(false);
+        setProductData(response);
+      })
+      .catch((error) => {
+        setLoading(false);
+        console.error("API Error:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    handleGetProductData();
+
+    return () => {};
+  }, [handleGetProductData]);
+
+  const handleOpen = ({ target }) => {
+    if (target && target.dataset.id) {
+      var data = productData.find((value) => value.id === Number(target.dataset.id));
+      if (!data) return;
+
+      setName(data.name);
+      setUpdateData(data);
+    }
+
+    if (open) {
+      setName(null);
+      setUpdateData({});
+    }
+
+    setOpen(!open);
+    setSaveLoading(false);
+  };
+
+  const handleOpenDelete = ({ target }) => {
+    if (target && target.dataset.id) {
+      var data = productData.find((value) => value.id === Number(target.dataset.id));
+      if (!data) return;
+
+      setDeleteData(data);
+    }
+
+    setOpenDelete(!openDelete);
+    setDeleteLoading(false);
+  };
+
+  const handleSaveProduct = () => {
+    if (!name) return;
+
+    const url = "/api/products" + (updateData.id ? "/" + updateData.id : "");
+    const method = updateData.id ? "PATCH" : "POST";
+
+    setSaveLoading(true);
+    fetch(url, {
+      method: method,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: name,
+      }),
+    })
+      .then((response) => response.json())
+      .then((response) => {
+        setSaveLoading(false);
+        setOpen(!open);
+        handleGetProductData();
+      })
+      .catch((error) => {
+        setSaveLoading(false);
+        console.error("API Error:", error);
+      });
+  };
+
+  const handleDeleteProduct = () => {
+    if (!deleteData.id) return;
+
+    setDeleteLoading(true);
+    fetch("/api/products/" + deleteData.id, { method: "DELETE" })
+      .then((response) => response.json())
+      .then((response) => {
+        setSaveLoading(false);
+        setOpenDelete(!openDelete);
+        handleGetProductData();
+      })
+      .catch((error) => {
+        setSaveLoading(false);
+        console.error("API Error:", error);
+      });
+  };
 
   return (
     <div className="h-full flex flex-col">
@@ -34,7 +135,7 @@ function Product() {
         <div>
           <Button onClick={handleOpen} className="flex items-center gap-2">
             <PlusIcon className="h-5 w-5" />
-            Add Product
+            Tambah Product
           </Button>
         </div>
       </div>
@@ -54,7 +155,7 @@ function Product() {
           </div>
           <div className="overflow-y-auto overflow-x-hidden gutter-stable">
             {productData.length ? (
-              productData.map(({ name }, index) => {
+              productData.map(({ id, name }, index) => {
                 return (
                   <div key={index} className="flex [&>div]:p-4 [&>div]:border-b [&>div]:border-blue-gray-50 -mr-[17px]">
                     <div className="flex-1 flex items-center">
@@ -63,10 +164,12 @@ function Product() {
                       </Typography>
                     </div>
                     <div className="flex gap-3 w-[217.89px] mr-[17px]">
-                      <Button variant="outlined" color="red">
-                        Delete
+                      <Button variant="outlined" color="red" data-id={id} onClick={handleOpenDelete}>
+                        Hapus
                       </Button>
-                      <Button variant="outlined">Edit</Button>
+                      <Button variant="outlined" data-id={id} onClick={handleOpen}>
+                        Ubah
+                      </Button>
                     </div>
                   </div>
                 );
@@ -87,45 +190,31 @@ function Product() {
       </div>
 
       <Dialog open={open} handler={handleOpen}>
-        <DialogHeader>Add Product</DialogHeader>
+        <DialogHeader>{updateData.id ? "Ubah" : "Tambah"} Produk</DialogHeader>
         <DialogBody>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="mb-4">
-              <Select label="Select Time">
-                <Option>06:00</Option>
-                <Option>07:00</Option>
-                <Option>08:00</Option>
-                <Option>09:00</Option>
-                <Option>10:00</Option>
-                <Option>11:00</Option>
-                <Option>13:00</Option>
-                <Option>14:00</Option>
-                <Option>15:00</Option>
-                <Option>16:00</Option>
-                <Option>17:00</Option>
-              </Select>
-            </div>
-            <div></div>
-            <div className="mb-1">
-              <Input label="Sample 1" size="lg" placeholder="example: 70" />
-            </div>
-            <div className="mb-1">
-              <Input label="Sample 2" size="lg" placeholder="example: 70" />
-            </div>
-            <div className="mb-1">
-              <Input label="Sample 3" size="lg" placeholder="example: 70" />
-            </div>
-            <div className="mb-1">
-              <Input label="Sample 4" size="lg" placeholder="example: 70" />
-            </div>
+          <div className="mb-1">
+            <Input label="Nama Product" size="lg" placeholder="example: Product 22"  value={name} onChange={onNameChange}/>
           </div>
         </DialogBody>
         <DialogFooter>
-          <Button variant="text" color="red" onClick={handleOpen} className="mr-3">
-            <span>Cancel</span>
+          <Button variant="text" onClick={handleOpen} className="mr-3">
+            <span>Batal</span>
           </Button>
-          <Button color="green" onClick={handleOpen}>
-            <span>Save</span>
+          <Button color="green" loading={saveLoading} onClick={handleSaveProduct}>
+            <span>Simpan</span>
+          </Button>
+        </DialogFooter>
+      </Dialog>
+
+      <Dialog open={openDelete} handler={handleOpenDelete}>
+        <DialogHeader>Hapus Produk</DialogHeader>
+        <DialogBody>Apakah anda yakin ingin menghapus {deleteData.name}?</DialogBody>
+        <DialogFooter>
+          <Button variant="text" onClick={handleOpenDelete} className="mr-3">
+            <span>Batal</span>
+          </Button>
+          <Button color="red" loading={deleteLoading} onClick={handleDeleteProduct}>
+            <span>Hapus</span>
           </Button>
         </DialogFooter>
       </Dialog>

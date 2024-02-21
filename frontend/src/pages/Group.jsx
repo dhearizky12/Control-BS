@@ -183,23 +183,23 @@ function Group() {
         </DialogBody>
         <DialogFooter>
           <Button variant="text" onClick={handleOpen} className="mr-3">
-            <span>Cancel</span>
+            <span>Batal</span>
           </Button>
           <Button color="green" loading={saveLoading} onClick={handleSaveGroup}>
-            <span>Save</span>
+            <span>Simpan</span>
           </Button>
         </DialogFooter>
       </Dialog>
 
       <Dialog open={openDelete} handler={handleOpenDelete}>
-        <DialogHeader>Hapus Shift</DialogHeader>
+        <DialogHeader>Hapus Group</DialogHeader>
         <DialogBody>Apakah anda yakin ingin menghapus {deleteData.name}?</DialogBody>
         <DialogFooter>
           <Button variant="text" onClick={handleOpenDelete} className="mr-3">
-            <span>Cancel</span>
+            <span>Batal</span>
           </Button>
           <Button color="red" loading={deleteLoading} onClick={handleDeleteGroup}>
-            <span>Delete</span>
+            <span>Hapus</span>
           </Button>
         </DialogFooter>
       </Dialog>

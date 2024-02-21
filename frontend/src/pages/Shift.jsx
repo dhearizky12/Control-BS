@@ -212,10 +212,10 @@ function Shift() {
         </DialogBody>
         <DialogFooter>
           <Button variant="text" onClick={handleOpen} className="mr-3">
-            <span>Cancel</span>
+            <span>Batal</span>
           </Button>
           <Button color="green" loading={saveLoading} onClick={handleSaveShift}>
-            <span>Save</span>
+            <span>Simpan</span>
           </Button>
         </DialogFooter>
       </Dialog>
@@ -225,10 +225,10 @@ function Shift() {
         <DialogBody>Apakah anda yakin ingin menghapus {deleteData.name}?</DialogBody>
         <DialogFooter>
           <Button variant="text" onClick={handleOpenDelete} className="mr-3">
-            <span>Cancel</span>
+            <span>Batal</span>
           </Button>
           <Button color="red" loading={deleteLoading} onClick={handleDeleteShift}>
-            <span>Delete</span>
+            <span>Hapus</span>
           </Button>
         </DialogFooter>
       </Dialog>
