@@ -16,7 +16,6 @@ Content-Type: application/json
     "sample2" : 70,
     "sample3" : 70,
     "sample4" : 70,
-    "averate" : 70,
     "shiftId" : 1,
     "targetId": 1
 }
@@ -30,7 +29,6 @@ Content-Type: application/json
     "sample2" : 70,
     "sample3" : 70,
     "sample4" : 70,
-    "averate" : 70,
     "shiftId" : 1,
     "targetId": 2
 }

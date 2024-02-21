@@ -224,7 +224,7 @@ function Production() {
         <div>
           <Button onClick={handleOpen} className="flex items-center gap-2">
             <PlusIcon className="h-5 w-5" />
-            Tambah Production
+            Tambah Produksi
           </Button>
         </div>
       </div>
@@ -314,7 +314,7 @@ function Production() {
       </div>
 
       <Dialog open={open} handler={handleOpen}>
-        <DialogHeader>{updateData.id ? "Ubah" : "Tambah"} Production</DialogHeader>
+        <DialogHeader>{updateData.id ? "Ubah" : "Tambah"} Produksi</DialogHeader>
         <DialogBody>
           <div className="grid grid-cols-2 gap-4">
             <div className="mb-1">
@@ -381,7 +381,7 @@ function Production() {
       </Dialog>
 
       <Dialog open={openDelete} handler={handleOpenDelete}>
-        <DialogHeader>Hapus Production</DialogHeader>
+        <DialogHeader>Hapus Produksi</DialogHeader>
         <DialogBody>Apakah anda yakin ingin menghapus produksi ini?</DialogBody>
         <DialogFooter>
           <Button variant="text" onClick={handleOpenDelete} className="mr-3">
