@@ -1,30 +1,40 @@
-import React, { memo, useRef } from "react";
-import { Card, Typography, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Input } from "@material-tailwind/react";
+import React, { memo, useEffect, useRef, useState } from "react";
+import { Card, Typography, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Input, Spinner } from "@material-tailwind/react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
 function Production() {
   const TABLE_HEAD = useRef(["Group", "Shift", "Hasil Adukan", "Penambahan BS", "Gramasi", "Hasil Produksi", "Waste"]);
-  const TABLE_ROWS = [
-    {
-      group: 1,
-      shift: 1,
-      mixResult: 70,
-      additionBS: 10,
-      grammage: 70,
-      result: 200,
-      waste: 10,
-    },
-    {
-      group: 1,
-      shift: 2,
-      mixResult: 70,
-      additionBS: 10,
-      grammage: 70,
-      result: 200,
-      waste: 10,
-    },
-  ];
-  const [open, setOpen] = React.useState(false);
+
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [productionsData, setProductionsData] = useState([]);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch("/api/productions", { method: "GET" })
+      .then((responses) => responses.json())
+      .then((responses) => {
+        setLoading(false);
+
+        setProductionsData(
+          responses.map((production) => {
+            production.group = production.group.name;
+            production.shift =
+              new Date(production.shift.time).getUTCHours().toString().padStart(2, "0") +
+              ":" +
+              new Date(production.shift.time).getUTCMinutes().toString().padStart(2, "0");
+
+            return production;
+          })
+        );
+      })
+      .catch((error) => {
+        setLoading(false);
+        console.error("API Error:", error);
+      });
+
+    return () => {};
+  }, []);
 
   const handleOpen = () => setOpen(!open);
 
@@ -54,47 +64,59 @@ function Production() {
             ))}
           </div>
           <div className="overflow-y-auto gutter-stable">
-            {TABLE_ROWS.map(({ group, shift, mixResult, additionBS, grammage, result }, index) => {
-              return (
-                <div key={index} className="grid grid-cols-7 [&>div]:p-4 [&>div]:border-b [&>div]:border-blue-gray-50 -mr-[17px]">
-                  <div>
-                    <Typography variant="small" color="blue-gray" className="font-bold">
-                      {group}
-                    </Typography>
+            {productionsData.length ? (
+              productionsData.map(({ group, shift, mixResult, additionBS, grammage, result, waste }, index) => {
+                return (
+                  <div key={index} className="grid grid-cols-7 [&>div]:p-4 [&>div]:border-b [&>div]:border-blue-gray-50 -mr-[17px]">
+                    <div>
+                      <Typography variant="small" color="blue-gray" className="font-bold">
+                        {group}
+                      </Typography>
+                    </div>
+                    <div>
+                      <Typography variant="small" color="blue-gray" className="font-normal">
+                        {shift}
+                      </Typography>
+                    </div>
+                    <div>
+                      <Typography variant="small" color="blue-gray" className="font-normal">
+                        {mixResult} Kg
+                      </Typography>
+                    </div>
+                    <div>
+                      <Typography variant="small" color="blue-gray" className="font-normal">
+                        {additionBS} Kg
+                      </Typography>
+                    </div>
+                    <div>
+                      <Typography variant="small" color="blue-gray" className="font-normal">
+                        {grammage} Kg
+                      </Typography>
+                    </div>
+                    <div>
+                      <Typography variant="small" color="blue-gray" className="font-normal">
+                        {result} Box
+                      </Typography>
+                    </div>
+                    <div>
+                      <Typography variant="small" color="blue-gray" className="font-normal">
+                        {waste} Kg
+                      </Typography>
+                    </div>
                   </div>
-                  <div>
-                    <Typography variant="small" color="blue-gray" className="font-normal">
-                      {shift}
-                    </Typography>
+                );
+              })
+            ) : (
+              <div className="px-3 py-5 text-center">
+                {loading ? (
+                  <div className="flex gap-2 items-center justify-center">
+                    <Spinner /> Memuat Data...
                   </div>
-                  <div>
-                    <Typography variant="small" color="blue-gray" className="font-normal">
-                      {mixResult} Kg
-                    </Typography>
-                  </div>
-                  <div>
-                    <Typography variant="small" color="blue-gray" className="font-normal">
-                      {additionBS} Kg
-                    </Typography>
-                  </div>
-                  <div>
-                    <Typography variant="small" color="blue-gray" className="font-normal">
-                      {grammage} Kg
-                    </Typography>
-                  </div>
-                  <div>
-                    <Typography variant="small" color="blue-gray" className="font-normal">
-                      {result} Box
-                    </Typography>
-                  </div>
-                  <div>
-                    <Typography variant="small" color="blue-gray" className="font-normal">
-                      {result} Kg
-                    </Typography>
-                  </div>
-                </div>
-              );
-            })}
+                ) : (
+                  "Data Kosong"
+                )}
+              </div>
+            )}
           </div>
         </Card>
       </div>

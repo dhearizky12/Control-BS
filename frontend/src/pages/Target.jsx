@@ -1,24 +1,37 @@
-import React, { memo, useRef } from "react";
-import { Card, CardBody, Typography, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Input } from "@material-tailwind/react";
+import React, { memo, useEffect, useRef, useState } from "react";
+import { Card, CardBody, Typography, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Input, Spinner } from "@material-tailwind/react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
 function Target() {
   const TABLE_HEAD = useRef(["Tanggal", "Nama Produk", "Target Produksi", "MID"]);
-  const TABLE_ROWS = [
-    {
-      date: 1,
-      product: 1,
-      target: 70,
-      mid: 10,
-    },
-    {
-      date: 1,
-      product: 1,
-      target: 70,
-      mid: 10,
-    },
-  ];
-  const [open, setOpen] = React.useState(false);
+
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [targetsData, setTargetsData] = useState([]);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch("/api/targets", { method: "GET" })
+      .then((responses) => responses.json())
+      .then((responses) => {
+        setLoading(false);
+
+        setTargetsData(
+          responses.map((target) => {
+            target.product = target.product.name;
+            target.date = new Date(target.date).toLocaleDateString()
+
+            return target;
+          })
+        );
+      })
+      .catch((error) => {
+        setLoading(false);
+        console.error("API Error:", error);
+      });
+
+    return () => {};
+  }, []);
 
   const handleOpen = () => setOpen(!open);
   return (
@@ -85,39 +98,51 @@ function Target() {
             <div className="grid grid-cols-4 bg-black border-b border-blue-gray-100 ">
               {TABLE_HEAD.current.map((head) => (
                 <div key={head} className="p-4">
-                  <Typography variant="small" color="white" className="font-bold leading-none text-md">
+                  <Typography color="white" className="font-bold leading-none text-md">
                     {head}
                   </Typography>
                 </div>
               ))}
             </div>
             <div className="overflow-y-auto gutter-stable">
-              {TABLE_ROWS.map(({ date, product, target, mid }, index) => {
-                return (
-                  <div key={index} className="grid grid-cols-4 [&>div]:p-4 [&>div]:border-b [&>div]:border-blue-gray-50 -mr-[17px]">
-                    <div>
-                      <Typography variant="small" color="blue-gray" className="font-bold">
-                        {date}
-                      </Typography>
+              {targetsData.length ? (
+                targetsData.map(({ date, product, target, mid }, index) => {
+                  return (
+                    <div key={index} className="grid grid-cols-4 [&>div]:p-4 [&>div]:border-b [&>div]:border-blue-gray-50 -mr-[17px]">
+                      <div>
+                        <Typography color="blue-gray" className="font-bold">
+                          {date}
+                        </Typography>
+                      </div>
+                      <div>
+                        <Typography color="blue-gray" className="font-normal">
+                          {product}
+                        </Typography>
+                      </div>
+                      <div>
+                        <Typography color="blue-gray" className="font-normal">
+                          {target} Box
+                        </Typography>
+                      </div>
+                      <div>
+                        <Typography color="blue-gray" className="font-normal">
+                          {mid}
+                        </Typography>
+                      </div>
                     </div>
-                    <div>
-                      <Typography variant="small" color="blue-gray" className="font-normal">
-                        {product}
-                      </Typography>
+                  );
+                })
+              ) : (
+                <div className="px-3 py-5 text-center">
+                  {loading ? (
+                    <div className="flex gap-2 items-center justify-center">
+                      <Spinner /> Memuat Data...
                     </div>
-                    <div>
-                      <Typography variant="small" color="blue-gray" className="font-normal">
-                        {target} Box
-                      </Typography>
-                    </div>
-                    <div>
-                      <Typography variant="small" color="blue-gray" className="font-normal">
-                        {mid}
-                      </Typography>
-                    </div>
-                  </div>
-                );
-              })}
+                  ) : (
+                    "Data Kosong"
+                  )}
+                </div>
+              )}
             </div>
           </Card>
         </div>
@@ -129,25 +154,16 @@ function Target() {
         <DialogBody>
           <div className="grid grid-cols-2 gap-4">
             <div className="mb-1">
-              <Input label="Group" size="lg" placeholder="example: 70" />
+              <Input label="Tanggal" size="lg" placeholder="" />
             </div>
             <div className="mb-1">
-              <Input label="Shift" size="lg" placeholder="example: 70" />
+              <Input label="Nama Produk" size="lg" placeholder="example: GIV Biru" />
             </div>
             <div className="mb-1">
-              <Input label="Hasil Adukan" size="lg" placeholder="example: 70" />
+              <Input label="Target Produksi" size="lg" placeholder="example: 400" />
             </div>
             <div className="mb-1">
-              <Input label="Penambahan BS" size="lg" placeholder="example: 70" />
-            </div>
-            <div className="mb-1">
-              <Input label="Gramasi" size="lg" placeholder="example: 70" />
-            </div>
-            <div className="mb-1">
-              <Input label="Hasil Produksi" size="lg" placeholder="example: 70" />
-            </div>
-            <div className="mb-1">
-              <Input label="Waste" size="lg" placeholder="example: 70" />
+              <Input label="MID" size="lg" placeholder="example: OP1234" />
             </div>
           </div>
         </DialogBody>

@@ -1,18 +1,22 @@
 import React, { memo, useEffect, useState } from "react";
-import { Card, Typography, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Input, Select, Option } from "@material-tailwind/react";
+import { Card, Typography, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Input, Select, Option, Spinner } from "@material-tailwind/react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
 function Group() {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [groupData, setGroupData] = useState([]);
 
   useEffect(() => {
+    setLoading(true);
     fetch("/api/groups", { method: "GET" })
       .then((response) => response.json())
       .then((response) => {
+        setLoading(false);
         setGroupData(response);
       })
       .catch((error) => {
+        setLoading(false);
         console.error("API Error:", error);
       });
 
@@ -68,7 +72,15 @@ function Group() {
                 );
               })
             ) : (
-              <div className="px-3 py-5 text-center">Data Kosong</div>
+              <div className="px-3 py-5 text-center">
+                {loading ? (
+                  <div className="flex gap-2 items-center justify-center">
+                    <Spinner /> Memuat Data...
+                  </div>
+                ) : (
+                  "Data Kosong"
+                )}
+              </div>
             )}
           </div>
         </Card>

@@ -1,18 +1,21 @@
 import React, { memo, useEffect, useRef, useState } from "react";
-import { Card, Typography, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Input, Select, Option } from "@material-tailwind/react";
+import { Card, Typography, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Input, Select, Option, Spinner } from "@material-tailwind/react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
 function Grammage() {
   const TABLE_HEAD = useRef(["Waktu Shift", "Sample 1", "Sample 2", "Sample 3", "Sample 4", "Average"]);
 
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [grammagesData, setGrammagesData] = useState([]);
-  const [averageSample, setAverageSample] = useState([]);
+  const [averageSample, setAverageSample] = useState([0, 0, 0, 0, 0]);
 
   useEffect(() => {
+    setLoading(true);
     fetch("/api/grammages", { method: "GET" })
       .then((responses) => responses.json())
       .then((responses) => {
+        setLoading(false);
         let averageSample = [];
 
         setGrammagesData(
@@ -36,6 +39,7 @@ function Grammage() {
         setAverageSample(averageSample);
       })
       .catch((error) => {
+        setLoading(false);
         console.error("API Error:", error);
       });
 
@@ -70,57 +74,71 @@ function Grammage() {
             ))}
           </div>
           <div className="overflow-y-auto overflow-x-hidden gutter-stable">
-            {grammagesData.map(({ shift, sample1, sample2, sample3, sample4, average }, index) => {
-              return (
-                <div key={index} className="grid grid-cols-6 [&>div]:p-4 [&>div]:border-b [&>div]:border-blue-gray-50 -mr-[17px]">
-                  <div>
-                    <Typography color="blue-gray" className="font-bold">
-                      {shift}
-                    </Typography>
+            {grammagesData.length ? (
+              grammagesData.map(({ shift, sample1, sample2, sample3, sample4, average }, index) => {
+                return (
+                  <div key={index} className="grid grid-cols-6 [&>div]:p-4 [&>div]:border-b [&>div]:border-blue-gray-50 -mr-[17px]">
+                    <div>
+                      <Typography color="blue-gray" className="font-bold">
+                        {shift}
+                      </Typography>
+                    </div>
+                    <div>
+                      <Typography color="blue-gray" className="font-normal">
+                        {sample1} Kg
+                      </Typography>
+                    </div>
+                    <div>
+                      <Typography color="blue-gray" className="font-normal">
+                        {sample2} Kg
+                      </Typography>
+                    </div>
+                    <div>
+                      <Typography color="blue-gray" className="font-normal">
+                        {sample3} Kg
+                      </Typography>
+                    </div>
+                    <div>
+                      <Typography color="blue-gray" className="font-normal">
+                        {sample4} Kg
+                      </Typography>
+                    </div>
+                    <div className="p-4 border-b !border-white bg-blue-gray-50">
+                      <Typography color="blue-gray" className="font-bold">
+                        {average} Kg
+                      </Typography>
+                    </div>
                   </div>
-                  <div>
-                    <Typography color="blue-gray" className="font-normal">
-                      {sample1} Kg
-                    </Typography>
+                );
+              })
+            ) : (
+              <div className="px-3 py-5 text-center">
+                {loading ? (
+                  <div className="flex gap-2 items-center justify-center">
+                    <Spinner /> Memuat Data...
                   </div>
-                  <div>
-                    <Typography color="blue-gray" className="font-normal">
-                      {sample2} Kg
-                    </Typography>
-                  </div>
-                  <div>
-                    <Typography color="blue-gray" className="font-normal">
-                      {sample3} Kg
-                    </Typography>
-                  </div>
-                  <div>
-                    <Typography color="blue-gray" className="font-normal">
-                      {sample4} Kg
-                    </Typography>
-                  </div>
-                  <div className="p-4 border-b !border-white bg-blue-gray-50">
-                    <Typography color="blue-gray" className="font-bold">
-                      {average} Kg
-                    </Typography>
-                  </div>
-                </div>
-              );
-            })}
+                ) : (
+                  "Data Kosong"
+                )}
+              </div>
+            )}
           </div>
-          <div className="grid grid-cols-6">
-            <div className="border-b border-blue-gray-100 bg-black py-4 pr-4 pl-[15px]">
-              <Typography color="white" className="font-bold leading-none text-md">
-                Average
-              </Typography>
-            </div>
-            {averageSample.map((foot, index) => (
-              <div key={index + "-foot"} className="border-b border-blue-gray-100 bg-black py-4 pr-4 pl-[15px]">
+          {grammagesData.length > 0 && (
+            <div className="grid grid-cols-6">
+              <div className="border-b border-blue-gray-100 bg-black py-4 pr-4 pl-[15px]">
                 <Typography color="white" className="font-bold leading-none text-md">
-                  {foot}
+                  Average
                 </Typography>
               </div>
-            ))}
-          </div>
+              {averageSample.map((foot, index) => (
+                <div key={index + "-foot"} className="border-b border-blue-gray-100 bg-black py-4 pr-4 pl-[15px]">
+                  <Typography color="white" className="font-bold leading-none text-md">
+                    {foot}
+                  </Typography>
+                </div>
+              ))}
+            </div>
+          )}
         </Card>
       </div>
 

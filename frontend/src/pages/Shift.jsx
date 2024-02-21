@@ -1,31 +1,133 @@
-import React, { memo, useEffect, useState } from "react";
-import { Card, Typography, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Input, Select, Option } from "@material-tailwind/react";
+import React, { memo, useCallback, useEffect, useState } from "react";
+import { Card, Typography, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Input, Select, Option, Spinner } from "@material-tailwind/react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
 function Shift() {
   const [open, setOpen] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [shiftData, setShiftData] = useState([]);
 
-  useEffect(() => {
+  const [time, setTime] = useState("");
+  const [name, setName] = useState("");
+  const [updateData, setUpdateData] = useState({});
+  const [deleteData, setDeleteData] = useState({});
+  const [saveLoading, setSaveLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const onTimeChange = ({ target }) => setTime(target.value);
+  const onNameChange = ({ target }) => setName(target.value);
+
+  const handleGetShiftData = useCallback(() => {
+    setLoading(true);
     fetch("/api/shifts", { method: "GET" })
       .then((response) => response.json())
       .then((response) => {
+        setLoading(false);
         setShiftData(response);
       })
       .catch((error) => {
+        setLoading(false);
         console.error("API Error:", error);
       });
-
-    return () => {};
   }, []);
 
-  const handleOpen = () => setOpen(!open);
+  useEffect(() => {
+    handleGetShiftData();
+
+    return () => {};
+  }, [handleGetShiftData]);
+
+  const handleOpen = ({ target }) => {
+    if (target && target.dataset.id) {
+      var data = shiftData.find((value) => value.id === Number(target.dataset.id));
+      if (!data) return;
+
+      setTime(new Date(data.time).getUTCHours().toString().padStart(2, "0") + ":" + new Date(data.time).getUTCMinutes().toString().padStart(2, "0"));
+      setName(data.name);
+      setUpdateData(data);
+    }
+    
+    if(open){
+      setTime(null);
+      setName(null);
+    }
+
+    setOpen(!open);
+    setSaveLoading(false);
+
+  };
+  const handleOpenDelete = ({ target }) => {
+    if (target && target.dataset.id) {
+      var data = shiftData.find((value) => value.id === Number(target.dataset.id));
+      if (!data) return;
+
+      setDeleteData(data);
+    }
+
+    setOpenDelete(!openDelete);
+    setDeleteLoading(false);
+  };
+
+  const handleSaveShift = () => {
+    const timeRegex = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
+
+    // Test the string
+    if (!timeRegex.test(time) || !name) return;
+
+    var timeSplit = time.split(":");
+
+    const utcStartDate = new Date(0);
+    const finalTime = new Date(utcStartDate.getTime() + Number(timeSplit[0]) * 60 * 60 * 1000 + Number(timeSplit[1]) * 60 * 1000);
+
+    const url = "/api/shifts" + (updateData ? "/" + updateData.id : "");
+    const method = updateData ? "PATCH" : "POST";
+
+    setSaveLoading(true);
+    fetch(url, {
+      method: method,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        time: finalTime,
+        name: name,
+      }),
+    })
+      .then((response) => response.json())
+      .then((response) => {
+        setSaveLoading(false);
+        setOpen(!open);
+        handleGetShiftData();
+      })
+      .catch((error) => {
+        setSaveLoading(false);
+        console.error("API Error:", error);
+      });
+  };
+
+  const handleDeleteShift = () => {
+    if (!deleteData.id) return;
+
+    setDeleteLoading(true);
+    fetch("/api/shifts/" + deleteData.id, { method: "DELETE" })
+      .then((response) => response.json())
+      .then((response) => {
+        setSaveLoading(false);
+        setOpenDelete(!openDelete);
+        handleGetShiftData();
+      })
+      .catch((error) => {
+        setSaveLoading(false);
+        console.error("API Error:", error);
+      });
+  };
 
   return (
     <div className="h-full flex flex-col">
       <div className="py-4 px-8 flex items-end gap-2">
         <div className="flex-1">
-          <div className="font-bold text-3xl">Master Data Shift </div>
+          <div className="font-bold text-3xl">Master Data Shift</div>
         </div>
         <div>
           <Button onClick={handleOpen} className="flex items-center gap-2">
@@ -56,7 +158,7 @@ function Shift() {
 
           <div className="overflow-y-auto overflow-x-hidden gutter-stable">
             {shiftData.length ? (
-              shiftData.map(({ time, name }, index) => {
+              shiftData.map(({ id, time, name }, index) => {
                 return (
                   <div key={index} className="flex [&>div]:p-4 [&>div]:border-b [&>div]:border-blue-gray-50 -mr-[17px]">
                     <div className="w-1/5 flex items-center">
@@ -70,61 +172,62 @@ function Shift() {
                       </Typography>
                     </div>
                     <div className="flex gap-3 w-[217.89px] mr-[17px]">
-                      <Button variant="outlined" color="red">
+                      <Button variant="outlined" color="red" data-id={id} onClick={handleOpenDelete}>
                         Delete
                       </Button>
-                      <Button variant="outlined">Edit</Button>
+                      <Button variant="outlined" data-id={id} onClick={handleOpen}>
+                        Edit
+                      </Button>
                     </div>
                   </div>
                 );
               })
             ) : (
-              <div className="px-3 py-5 text-center">Data Kosong</div>
+              <div className="px-3 py-5 text-center">
+                {loading ? (
+                  <div className="flex gap-2 items-center justify-center">
+                    <Spinner /> Memuat Data...
+                  </div>
+                ) : (
+                  "Data Kosong"
+                )}
+              </div>
             )}
           </div>
         </Card>
       </div>
 
       <Dialog open={open} handler={handleOpen}>
-        <DialogHeader>Add Shift</DialogHeader>
+        <DialogHeader>{updateData ? "Edit" : "Tambah"} Shift</DialogHeader>
         <DialogBody>
           <div className="grid grid-cols-2 gap-4">
-            <div className="mb-4">
-              <Select label="Select Time">
-                <Option>06:00</Option>
-                <Option>07:00</Option>
-                <Option>08:00</Option>
-                <Option>09:00</Option>
-                <Option>10:00</Option>
-                <Option>11:00</Option>
-                <Option>13:00</Option>
-                <Option>14:00</Option>
-                <Option>15:00</Option>
-                <Option>16:00</Option>
-                <Option>17:00</Option>
-              </Select>
-            </div>
-            <div></div>
             <div className="mb-1">
-              <Input label="Sample 1" size="lg" placeholder="example: 70" />
+              <Input label="Waktu" size="lg" placeholder="example: 17:00" value={time} onChange={onTimeChange} />
             </div>
             <div className="mb-1">
-              <Input label="Sample 2" size="lg" placeholder="example: 70" />
-            </div>
-            <div className="mb-1">
-              <Input label="Sample 3" size="lg" placeholder="example: 70" />
-            </div>
-            <div className="mb-1">
-              <Input label="Sample 4" size="lg" placeholder="example: 70" />
+              <Input label="Nama" size="lg" placeholder="example: Shift 7" value={name} onChange={onNameChange} />
             </div>
           </div>
         </DialogBody>
         <DialogFooter>
-          <Button variant="text" color="red" onClick={handleOpen} className="mr-3">
+          <Button variant="text" onClick={handleOpen} className="mr-3">
             <span>Cancel</span>
           </Button>
-          <Button color="green" onClick={handleOpen}>
+          <Button color="green" loading={saveLoading} onClick={handleSaveShift}>
             <span>Save</span>
+          </Button>
+        </DialogFooter>
+      </Dialog>
+
+      <Dialog open={openDelete} handler={handleOpenDelete}>
+        <DialogHeader>Hapus Shift</DialogHeader>
+        <DialogBody>Apakah anda yakin ingin menghapus {deleteData.name}?</DialogBody>
+        <DialogFooter>
+          <Button variant="text" onClick={handleOpenDelete} className="mr-3">
+            <span>Cancel</span>
+          </Button>
+          <Button color="red" loading={deleteLoading} onClick={handleDeleteShift}>
+            <span>Delete</span>
           </Button>
         </DialogFooter>
       </Dialog>
