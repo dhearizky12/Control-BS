@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useEffect, useState } from "react";
-import { Card, Typography, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Input, Select, Option, Spinner } from "@material-tailwind/react";
+import { Card, Typography, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Input, Spinner } from "@material-tailwind/react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
 function Shift() {
@@ -66,6 +66,10 @@ function Shift() {
       setDeleteData(data);
     }
 
+    if (openDelete) {
+      setDeleteData({});
+    }
+
     setOpenDelete(!openDelete);
     setDeleteLoading(false);
   };
@@ -98,7 +102,7 @@ function Shift() {
       .then((response) => response.json())
       .then((response) => {
         setSaveLoading(false);
-        setOpen(!open);
+        handleOpen({});
         handleGetShiftData();
       })
       .catch((error) => {
@@ -115,7 +119,7 @@ function Shift() {
       .then((response) => response.json())
       .then((response) => {
         setSaveLoading(false);
-        setOpenDelete(!openDelete);
+        handleOpenDelete({});
         handleGetShiftData();
       })
       .catch((error) => {

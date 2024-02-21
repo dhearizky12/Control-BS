@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useEffect, useState } from "react";
-import { Card, Typography, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Input, Select, Option, Spinner } from "@material-tailwind/react";
+import { Card, Typography, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Input, Spinner } from "@material-tailwind/react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
 function Product() {
@@ -14,21 +14,6 @@ function Product() {
   const [saveLoading, setSaveLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
-  useEffect(() => {
-    setLoading(true);
-    fetch("/api/products", { method: "GET" })
-      .then((response) => response.json())
-      .then((response) => {
-        setLoading(false);
-        setProductData(response);
-      })
-      .catch((error) => {
-        setLoading(false);
-        console.error("API Error:", error);
-      });
-
-    return () => {};
-  }, []);
   const onNameChange = ({ target }) => setName(target.value);
 
   const handleGetProductData = useCallback(() => {
@@ -77,6 +62,10 @@ function Product() {
       setDeleteData(data);
     }
 
+    if (openDelete) {
+      setDeleteData({});
+    }
+
     setOpenDelete(!openDelete);
     setDeleteLoading(false);
   };
@@ -100,7 +89,7 @@ function Product() {
       .then((response) => response.json())
       .then((response) => {
         setSaveLoading(false);
-        setOpen(!open);
+        handleOpen({});
         handleGetProductData();
       })
       .catch((error) => {
@@ -117,7 +106,7 @@ function Product() {
       .then((response) => response.json())
       .then((response) => {
         setSaveLoading(false);
-        setOpenDelete(!openDelete);
+        handleOpenDelete({});
         handleGetProductData();
       })
       .catch((error) => {
@@ -193,7 +182,7 @@ function Product() {
         <DialogHeader>{updateData.id ? "Ubah" : "Tambah"} Produk</DialogHeader>
         <DialogBody>
           <div className="mb-1">
-            <Input label="Nama Product" size="lg" placeholder="example: Product 22"  value={name} onChange={onNameChange}/>
+            <Input label="Nama Product" size="lg" placeholder="example: Product 22" value={name} onChange={onNameChange} />
           </div>
         </DialogBody>
         <DialogFooter>

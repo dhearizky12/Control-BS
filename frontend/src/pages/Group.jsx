@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useEffect, useState } from "react";
-import { Card, Typography, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Input, Select, Option, Spinner } from "@material-tailwind/react";
+import { Card, Typography, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Input, Spinner } from "@material-tailwind/react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
 function Group() {
@@ -47,7 +47,7 @@ function Group() {
 
     if (open) {
       setName(null);
-      setUpdateData({})
+      setUpdateData({});
     }
 
     setOpen(!open);
@@ -60,6 +60,10 @@ function Group() {
       if (!data) return;
 
       setDeleteData(data);
+    }
+
+    if (openDelete) {
+      setDeleteData({});
     }
 
     setOpenDelete(!openDelete);
@@ -85,7 +89,7 @@ function Group() {
       .then((response) => response.json())
       .then((response) => {
         setSaveLoading(false);
-        setOpen(!open);
+        handleOpen({});
         handleGetGroupData();
       })
       .catch((error) => {
@@ -102,7 +106,7 @@ function Group() {
       .then((response) => response.json())
       .then((response) => {
         setSaveLoading(false);
-        setOpenDelete(!openDelete);
+        handleOpenDelete({});
         handleGetGroupData();
       })
       .catch((error) => {
@@ -178,7 +182,7 @@ function Group() {
         <DialogHeader>{updateData.id ? "Ubah" : "Tambah"} Group</DialogHeader>
         <DialogBody>
           <div className="mb-1">
-            <Input label="Nama Group" size="lg" placeholder="example: Group 22"  value={name} onChange={onNameChange}/>
+            <Input label="Nama Group" size="lg" placeholder="example: Group 22" value={name} onChange={onNameChange} />
           </div>
         </DialogBody>
         <DialogFooter>
