@@ -3,7 +3,7 @@ import { Card, Typography, Button, Dialog, DialogHeader, DialogBody, DialogFoote
 import { PlusIcon } from "@heroicons/react/24/outline";
 
 function Production() {
-  const TABLE_HEAD = useRef(["MID", "Group", "Shift", "Hasil Adukan", "Tambahan BS", "Gramasi", "Hasil Produksi", "Waste"]);
+  const TABLE_HEAD = useRef(["MID", "Group", "Shift", "Hasil Adukan", "Tambahan BS", "Gramasi", "Hasil Produksi", "Waste", "Aksi"]);
 
   const [open, setOpen] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
@@ -107,13 +107,19 @@ function Production() {
   }, [handleGetProductionData]);
 
   const handleOpen = async ({ target }) => {
+    if(!open) {
+      setOpenLoading(true);
+      await Promise.all([handleGetGroupData(), handleGetShiftData(), handleGetTargetData()]);
+      setOpenLoading(false);
+    }
+    
     if (target && target.dataset.id) {
       var data = productionsData.find((value) => value.id === Number(target.dataset.id));
       if (!data) return;
 
-      setTarget(data.target);
-      setGroup(data.group);
-      setShift(data.shift);
+      setTarget(data.targetId.toString());
+      setGroup(data.groupId.toString());
+      setShift(data.shiftId.toString());
       setMixResult(data.mixResult);
       setAdditionBS(data.additionBS);
       setGrammage(data.grammage);
@@ -132,10 +138,6 @@ function Production() {
       setResult(null);
       setWaste(null);
       setUpdateData({});
-    } else {
-      setOpenLoading(true);
-      await Promise.all([handleGetGroupData(), handleGetShiftData(), handleGetTargetData()]);
-      setOpenLoading(false);
     }
 
     setOpen(!open);
@@ -161,7 +163,6 @@ function Production() {
   const handleOpenLoading = () => setOpenLoading(!openLoading);
 
   const handleSaveProduction = () => {
-    console.log(target, group, shift, mixResult, additionBS, grammage, result, waste);
     if (!target || !group || !shift || !mixResult || !additionBS || !grammage || !result || !waste) return;
 
     const url = "/api/productions" + (updateData.id ? "/" + updateData.id : "");
@@ -229,9 +230,9 @@ function Production() {
       </div>
       <div className="flex-1 w-full overflow-hidden pb-4 px-8">
         <Card className="max-h-full h-fit w-full overflow-hidden flex flex-col">
-          <div className="grid grid-cols-8 bg-black border-b border-blue-gray-100 ">
-            {TABLE_HEAD.current.map((head) => (
-              <div key={head} className="p-4">
+          <div className="grid grid-cols-[repeat(8,_1fr)_auto] bg-black border-b border-blue-gray-100 ">
+            {TABLE_HEAD.current.map((head, index) => (
+              <div key={head} className={"p-4" + (index === 8 ? ' w-[217.89px] mr-[17px]' : '')}>
                 <Typography variant="small" color="white" className="font-bold leading-none text-md">
                   {head}
                 </Typography>
@@ -240,9 +241,12 @@ function Production() {
           </div>
           <div className="overflow-y-auto gutter-stable">
             {productionsData.length ? (
-              productionsData.map(({ mid, group, shift, mixResult, additionBS, grammage, result, waste }, index) => {
+              productionsData.map(({ id, mid, group, shift, mixResult, additionBS, grammage, result, waste }, index) => {
                 return (
-                  <div key={index} className="grid grid-cols-8 [&>div]:p-4 [&>div]:border-b [&>div]:border-blue-gray-50 -mr-[17px]">
+                  <div
+                    key={index}
+                    className="grid grid-cols-[repeat(8,_1fr)_auto] [&>div]:p-4 [&>div]:border-b [&>div]:border-blue-gray-50 -mr-[17px]"
+                  >
                     <div>
                       <Typography variant="small" color="blue-gray" className="font-bold">
                         {mid}
@@ -282,6 +286,14 @@ function Production() {
                       <Typography variant="small" color="blue-gray" className="font-normal">
                         {waste} Kg
                       </Typography>
+                    </div>
+                    <div className="flex gap-3 w-[217.89px] mr-[17px]">
+                      <Button variant="outlined" color="red" data-id={id} onClick={handleOpenDelete}>
+                        Hapus
+                      </Button>
+                      <Button variant="outlined" data-id={id} onClick={handleOpen}>
+                        Ubah
+                      </Button>
                     </div>
                   </div>
                 );
