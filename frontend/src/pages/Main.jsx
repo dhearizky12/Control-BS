@@ -46,7 +46,7 @@ function Main() {
               <ListItemPrefix>
                 <PresentationChartBarIcon className="h-5 w-5 !text-blue-gray-900" />
               </ListItemPrefix>
-              Dashboard
+              Beranda
             </ListItem>
           </NavLink>
           <NavLink to="/target" className={({ isActive }) => (isActive ? "[&>div]:bg-blue-gray-100/50 [&>div]:text-blue-gray-900 " : "")}>
@@ -62,7 +62,7 @@ function Main() {
               <ListItemPrefix>
                 <BeakerIcon className="h-5 w-5" />
               </ListItemPrefix>
-              Production
+              Produksi
             </ListItem>
           </NavLink>
           <NavLink to="/grammage" className={({ isActive }) => (isActive ? "[&>div]:bg-blue-gray-100/50 [&>div]:text-blue-gray-900 " : "")}>
@@ -113,6 +113,17 @@ function Main() {
                       <MinusIcon className="h-5 w-5 !text-blue-gray-900" />
                     </ListItemPrefix>
                     Shift
+                  </ListItem>
+                </NavLink>
+                <NavLink
+                  to="/master/working-hour"
+                  className={({ isActive }) => (isActive ? "[&>div]:bg-blue-gray-100/50 [&>div]:text-blue-gray-900 " : "")}
+                >
+                  <ListItem>
+                    <ListItemPrefix>
+                      <MinusIcon className="h-5 w-5 !text-blue-gray-900" />
+                    </ListItemPrefix>
+                    Jam Kerja
                   </ListItem>
                 </NavLink>
               </List>

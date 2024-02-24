@@ -7,6 +7,7 @@ import Grammage from "./pages/Grammage";
 import Product from "./pages/Product";
 import Group from "./pages/Group";
 import Shift from "./pages/Shift";
+import WorkingHour from "./pages/WorkingHour";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/master/product" element={<Product />} />
           <Route path="/master/group" element={<Group />} />
           <Route path="/master/shift" element={<Shift />} />
+          <Route path="/master/working-hour" element={<WorkingHour />} />
         </Route>
       </Routes>
     </BrowserRouter>

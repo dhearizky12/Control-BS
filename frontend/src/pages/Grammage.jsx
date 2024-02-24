@@ -233,32 +233,32 @@ function Grammage() {
                     key={index}
                     className="grid  grid-cols-[repeat(7,_1fr)_auto] [&>div]:p-4 [&>div]:border-b [&>div]:border-blue-gray-50 -mr-[17px]"
                   >
-                    <div>
+                    <div className="flex items-center">
                       <Typography color="blue-gray" className="font-bold">
                         {shift}
                       </Typography>
                     </div>
-                    <div>
+                    <div className="flex items-center">
                       <Typography color="blue-gray" className="font-normal">
                         {sample1} Kg
                       </Typography>
                     </div>
-                    <div>
+                    <div className="flex items-center">
                       <Typography color="blue-gray" className="font-normal">
                         {sample2} Kg
                       </Typography>
                     </div>
-                    <div>
+                    <div className="flex items-center">
                       <Typography color="blue-gray" className="font-normal">
                         {sample3} Kg
                       </Typography>
                     </div>
-                    <div>
+                    <div className="flex items-center">
                       <Typography color="blue-gray" className="font-normal">
                         {sample4} Kg
                       </Typography>
                     </div>
-                    <div className="p-4 border-b !border-white bg-blue-gray-50">
+                    <div className="p-4 border-b !border-white bg-blue-gray-50 flex items-center">
                       <Typography color="blue-gray" className="font-bold">
                         {average} Kg
                       </Typography>

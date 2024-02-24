@@ -247,42 +247,42 @@ function Production() {
                     key={index}
                     className="grid grid-cols-[repeat(8,_1fr)_auto] [&>div]:p-4 [&>div]:border-b [&>div]:border-blue-gray-50 -mr-[17px]"
                   >
-                    <div>
+                    <div className="flex items-center">
                       <Typography variant="small" color="blue-gray" className="font-bold">
                         {mid}
                       </Typography>
                     </div>
-                    <div>
+                    <div className="flex items-center">
                       <Typography variant="small" color="blue-gray" className="font-bold">
                         {group}
                       </Typography>
                     </div>
-                    <div>
+                    <div className="flex items-center">
                       <Typography variant="small" color="blue-gray" className="font-normal">
                         {shift}
                       </Typography>
                     </div>
-                    <div>
+                    <div className="flex items-center">
                       <Typography variant="small" color="blue-gray" className="font-normal">
                         {mixResult} Kg
                       </Typography>
                     </div>
-                    <div>
+                    <div className="flex items-center">
                       <Typography variant="small" color="blue-gray" className="font-normal">
                         {additionBS} Kg
                       </Typography>
                     </div>
-                    <div>
+                    <div className="flex items-center">
                       <Typography variant="small" color="blue-gray" className="font-normal">
                         {grammage} Kg
                       </Typography>
                     </div>
-                    <div>
+                    <div className="flex items-center">
                       <Typography variant="small" color="blue-gray" className="font-normal">
                         {result} Box
                       </Typography>
                     </div>
-                    <div>
+                    <div className="flex items-center">
                       <Typography variant="small" color="blue-gray" className="font-normal">
                         {waste} Kg
                       </Typography>
