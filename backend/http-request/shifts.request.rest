@@ -2,7 +2,7 @@
 GET http://localhost:3200/api/shifts
 
 ###
-GET http://localhost:3200/api/shifts?time=72000000&name=Shift 15
+GET http://localhost:3200/api/shifts?startWorkingHourId=1&endWorkingHourId=3
 
 ###
 GET http://localhost:3200/api/shifts/1
@@ -12,8 +12,9 @@ POST http://localhost:3200/api/shifts
 Content-Type: application/json
 
 {
-    "time" :  72000000,
-    "name" : "Shift 15"
+    "startWorkingHourId": 1,
+    "endWorkingHourId": 3,
+    "name" : "Shift 1"
 }
 
 ###
@@ -21,7 +22,8 @@ PATCH http://localhost:3200/api/shifts/1
 Content-Type: application/json
 
 {
-    "time" :  72000000,
+    "startWorkingHourId": 4,
+    "endWorkingHourId": 6,
     "name" : "Shift 15"
 }
 

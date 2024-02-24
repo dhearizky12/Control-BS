@@ -1,9 +1,14 @@
 import Shift from "../models/ShiftModel.js";
+import WorkingHour from "../models/WorkingHourModel.js";
 
 export const getShifts = async (req, res) => {
   try {
     const response = await Shift.findAll({
       where: req.query,
+      include: [
+        { model: WorkingHour, as: "startWorkingHour" },
+        { model: WorkingHour, as: "endWorkingHour" },
+      ],
     });
     res.status(200).json(response);
   } catch (error) {
