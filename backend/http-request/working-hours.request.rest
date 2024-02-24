@@ -1,0 +1,27 @@
+###
+GET http://localhost:3200/api/working-hours
+
+###
+GET http://localhost:3200/api/working-hours?time=1970-01-01T06:00:00.000Z
+
+###
+GET http://localhost:3200/api/working-hours/1
+
+###
+POST http://localhost:3200/api/working-hours
+Content-Type: application/json
+
+{
+    "time" :  72000000,
+}
+
+###
+PATCH http://localhost:3200/api/working-hours/1
+Content-Type: application/json
+
+{
+    "time" :  72000000,
+}
+
+###
+DELETE http://localhost:3200/api/working-hours/2

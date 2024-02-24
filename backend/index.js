@@ -3,6 +3,7 @@ import cors from "cors";
 import path from "path";
 import Config from "./config/Config.js";
 import UserRoute from "./routes/UserRoute.js";
+import WorkingHourRoute from "./routes/WorkingHourRoute.js";
 import ShiftRoute from "./routes/ShiftRoute.js";
 import GroupRoute from "./routes/GroupRoute.js";
 import ProductRoute from "./routes/ProductRoute.js";
@@ -17,6 +18,7 @@ app.use(express.json());
 const apiRouter = express.Router();
 
 apiRouter.use(UserRoute);
+apiRouter.use(WorkingHourRoute);
 apiRouter.use(ShiftRoute);
 apiRouter.use(GroupRoute);
 apiRouter.use(ProductRoute);
