@@ -14,8 +14,8 @@ function Grammage() {
   const [targetsData, setTargetsData] = useState([]);
   const [shiftsData, setShiftsData] = useState([]);
 
-  const [target, setTarget] = useState(null);
-  const [shift, setShift] = useState(null);
+  const [target, setTarget] = useState("");
+  const [shift, setShift] = useState("");
   const [sample1, setSample1] = useState("");
   const [sample2, setSample2] = useState("");
   const [sample3, setSample3] = useState("");
@@ -119,8 +119,8 @@ function Grammage() {
     }
 
     if (open) {
-      setTarget(null);
-      setShift(null);
+      setTarget("");
+      setShift("");
       setSample1("");
       setSample2("");
       setSample3("");

@@ -46,7 +46,7 @@ function Product() {
     }
 
     if (open) {
-      setName(null);
+      setName("");
       setUpdateData({});
     }
 

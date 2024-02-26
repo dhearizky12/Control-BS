@@ -46,7 +46,7 @@ function Group() {
     }
 
     if (open) {
-      setName(null);
+      setName("");
       setUpdateData({});
     }
 

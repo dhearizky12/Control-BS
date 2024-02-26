@@ -46,7 +46,7 @@ function WorkingHour() {
     }
 
     if (open) {
-      setTime(null);
+      setTime("");
       setUpdateData({});
     }
 
@@ -139,7 +139,7 @@ function WorkingHour() {
       <div className="flex-1 w-full overflow-hidden pb-4 px-8">
         <Card className="max-h-full h-fit w-full overflow-hidden flex flex-col">
           <div className="flex bg-black border-b border-blue-gray-100 ">
-            <div className="p-4 w-1/5">
+            <div className="p-4 flex-1">
               <Typography color="white" className="font-bold leading-none text-md">
                 Waktu
               </Typography>
@@ -153,17 +153,12 @@ function WorkingHour() {
 
           <div className="overflow-y-auto overflow-x-hidden gutter-stable">
             {workingHourData.length ? (
-              workingHourData.map(({ id, time, name }, index) => {
+              workingHourData.map(({ id, time }, index) => {
                 return (
                   <div key={index} className="flex [&>div]:p-4 [&>div]:border-b [&>div]:border-blue-gray-50 -mr-[17px]">
-                    <div className="w-1/5 flex items-center">
+                    <div className="flex-1 flex items-center">
                       <Typography color="blue-gray" className="font-bold">
                         {new Date(time).getUTCHours().toString().padStart(2, "0") + ":" + new Date(time).getUTCMinutes().toString().padStart(2, "0")}
-                      </Typography>
-                    </div>
-                    <div className="flex-1 flex items-center">
-                      <Typography color="blue-gray" className="font-normal">
-                        {name}
                       </Typography>
                     </div>
                     <div className="flex gap-3 w-[217.89px] mr-[17px]">

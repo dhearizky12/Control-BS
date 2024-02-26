@@ -71,8 +71,9 @@ function Shift() {
     }
 
     if (open) {
-      setStartWorkingHour(null);
-      setName(null);
+      setName("");
+      setStartWorkingHour("");
+      setEndWorkingHour("");
       setUpdateData({});
     }
 

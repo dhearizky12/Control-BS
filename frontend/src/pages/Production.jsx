@@ -14,9 +14,9 @@ function Production() {
   const [groupsData, setGroupsData] = useState([]);
   const [shiftsData, setShiftsData] = useState([]);
 
-  const [target, setTarget] = useState(null);
-  const [group, setGroup] = useState(null);
-  const [shift, setShift] = useState(null);
+  const [target, setTarget] = useState("");
+  const [group, setGroup] = useState("");
+  const [shift, setShift] = useState("");
   const [mixResult, setMixResult] = useState("");
   const [additionBS, setAdditionBS] = useState("");
   const [grammage, setGrammage] = useState("");
@@ -129,14 +129,14 @@ function Production() {
     }
 
     if (open) {
-      setTarget(null);
-      setGroup(null);
-      setShift(null);
-      setMixResult(null);
-      setAdditionBS(null);
-      setGrammage(null);
-      setResult(null);
-      setWaste(null);
+      setTarget("");
+      setGroup("");
+      setShift("");
+      setMixResult("");
+      setAdditionBS("");
+      setGrammage("");
+      setResult("");
+      setWaste("");
       setUpdateData({});
     }
 
