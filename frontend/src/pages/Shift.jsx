@@ -1,21 +1,23 @@
 import React, { memo, useCallback, useEffect, useState } from "react";
-import { Card, Typography, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Input, Spinner } from "@material-tailwind/react";
+import { Card, Typography, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Input, Spinner, Select, Option } from "@material-tailwind/react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
 function Shift() {
   const [open, setOpen] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
+  const [openLoading, setOpenLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [shiftData, setShiftData] = useState([]);
+  const [workingHourData, setWorkingHourData] = useState([]);
 
-  const [time, setTime] = useState("");
   const [name, setName] = useState("");
+  const [startWorkingHour, setStartWorkingHour] = useState("");
+  const [endWorkingHour, setEndWorkingHour] = useState("");
   const [updateData, setUpdateData] = useState({});
   const [deleteData, setDeleteData] = useState({});
   const [saveLoading, setSaveLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
-  const onTimeChange = ({ target }) => setTime(target.value);
   const onNameChange = ({ target }) => setName(target.value);
 
   const handleGetShiftData = useCallback(() => {
@@ -32,24 +34,44 @@ function Shift() {
       });
   }, []);
 
+  const handleGetWorkingHourData = useCallback(() => {
+    return fetch("/api/working-hours", { method: "GET" })
+      .then((response) => response.json())
+      .then((response) => {
+        setLoading(false);
+        setWorkingHourData(response);
+      })
+      .catch((error) => {
+        setLoading(false);
+        console.error("API Error:", error);
+      });
+  }, []);
+
   useEffect(() => {
     handleGetShiftData();
 
     return () => {};
   }, [handleGetShiftData]);
 
-  const handleOpen = ({ target }) => {
+  const handleOpen = async ({ target }) => {
+    if (!open) {
+      setOpenLoading(true);
+      await Promise.all([handleGetWorkingHourData()]);
+      setOpenLoading(false);
+    }
+
     if (target && target.dataset.id) {
       var data = shiftData.find((value) => value.id === Number(target.dataset.id));
       if (!data) return;
 
-      setTime(new Date(data.time).getUTCHours().toString().padStart(2, "0") + ":" + new Date(data.time).getUTCMinutes().toString().padStart(2, "0"));
       setName(data.name);
+      setStartWorkingHour(data.startWorkingHourId.toString());
+      setEndWorkingHour(data.endWorkingHourId.toString());
       setUpdateData(data);
     }
 
     if (open) {
-      setTime(null);
+      setStartWorkingHour(null);
       setName(null);
       setUpdateData({});
     }
@@ -74,16 +96,12 @@ function Shift() {
     setDeleteLoading(false);
   };
 
+  const handleOpenLoading = () => setOpenLoading(!openLoading);
+
   const handleSaveShift = () => {
-    const timeRegex = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
 
     // Test the string
-    if (!timeRegex.test(time) || !name) return;
-
-    var timeSplit = time.split(":");
-
-    const utcStartDate = new Date(0);
-    const finalTime = new Date(utcStartDate.getTime() + Number(timeSplit[0]) * 60 * 60 * 1000 + Number(timeSplit[1]) * 60 * 1000);
+    if (!name || !startWorkingHour || !endWorkingHour) return;
 
     const url = "/api/shifts" + (updateData.id ? "/" + updateData.id : "");
     const method = updateData.id ? "PATCH" : "POST";
@@ -95,8 +113,9 @@ function Shift() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        time: finalTime,
         name: name,
+        startWorkingHourId: startWorkingHour,
+        endWorkingHourId: endWorkingHour,
       }),
     })
       .then((response) => response.json())
@@ -144,14 +163,19 @@ function Shift() {
       <div className="flex-1 w-full overflow-hidden pb-4 px-8">
         <Card className="max-h-full h-fit w-full overflow-hidden flex flex-col">
           <div className="flex bg-black border-b border-blue-gray-100 ">
-            <div className="p-4 w-1/5">
-              <Typography color="white" className="font-bold leading-none text-md">
-                Waktu
-              </Typography>
-            </div>
             <div className="p-4 flex-1">
               <Typography color="white" className="font-bold leading-none text-md">
                 Nama Shift
+              </Typography>
+            </div>
+            <div className="p-4 w-1/5">
+              <Typography color="white" className="font-bold leading-none text-md">
+                Mulai Waktu Kerja
+              </Typography>
+            </div>
+            <div className="p-4 w-1/5">
+              <Typography color="white" className="font-bold leading-none text-md">
+                Selesai Waktu Kerja
               </Typography>
             </div>
             <div className="p-4 w-[217.89px] mr-[17px]">
@@ -163,17 +187,26 @@ function Shift() {
 
           <div className="overflow-y-auto overflow-x-hidden gutter-stable">
             {shiftData.length ? (
-              shiftData.map(({ id, time, name }, index) => {
+              shiftData.map(({ id, startWorkingHour, endWorkingHour, name }, index) => {
                 return (
                   <div key={index} className="flex [&>div]:p-4 [&>div]:border-b [&>div]:border-blue-gray-50 -mr-[17px]">
-                    <div className="w-1/5 flex items-center">
-                      <Typography color="blue-gray" className="font-bold">
-                        {new Date(time).getUTCHours().toString().padStart(2, "0") + ":" + new Date(time).getUTCMinutes().toString().padStart(2, "0")}
-                      </Typography>
-                    </div>
                     <div className="flex-1 flex items-center">
                       <Typography color="blue-gray" className="font-normal">
                         {name}
+                      </Typography>
+                    </div>
+                    <div className="w-1/5 flex items-center">
+                      <Typography color="blue-gray" className="font-bold">
+                        {new Date(startWorkingHour.time).getUTCHours().toString().padStart(2, "0") +
+                          ":" +
+                          new Date(startWorkingHour.time).getUTCMinutes().toString().padStart(2, "0")}
+                      </Typography>
+                    </div>
+                    <div className="w-1/5 flex items-center">
+                      <Typography color="blue-gray" className="font-bold">
+                        {new Date(endWorkingHour.time).getUTCHours().toString().padStart(2, "0") +
+                          ":" +
+                          new Date(endWorkingHour.time).getUTCMinutes().toString().padStart(2, "0")}
                       </Typography>
                     </div>
                     <div className="flex gap-3 w-[217.89px] mr-[17px]">
@@ -207,10 +240,45 @@ function Shift() {
         <DialogBody>
           <div className="grid grid-cols-2 gap-4">
             <div className="mb-1">
-              <Input label="Waktu" size="lg" placeholder="example: 17:00" value={time} onChange={onTimeChange} />
+              <Input label="Nama" size="lg" placeholder="example: Shift 7" value={name} onChange={onNameChange} />
             </div>
             <div className="mb-1">
-              <Input label="Nama" size="lg" placeholder="example: Shift 7" value={name} onChange={onNameChange} />
+              <Select
+                label="Mulai Jam Kerja"
+                size="lg"
+                placeholder="Pilih Mulai Jam Kerja"
+                value={startWorkingHour}
+                onChange={setStartWorkingHour}
+              >
+                {workingHourData.map((workingHour, index) => {
+                  return (
+                    <Option key={index} value={workingHour.id.toString()}>
+                      {new Date(workingHour.time).getUTCHours().toString().padStart(2, "0") +
+                        ":" +
+                        new Date(workingHour.time).getUTCMinutes().toString().padStart(2, "0")}
+                    </Option>
+                  );
+                })}
+              </Select>
+            </div>
+            <div className="mb-1">
+              <Select
+                label="Selesai Jam Kerja"
+                size="lg"
+                placeholder="Pilih Selesai Jam Kerja"
+                value={endWorkingHour}
+                onChange={setEndWorkingHour}
+              >
+                {workingHourData.map((workingHour, index) => {
+                  return (
+                    <Option key={index} value={workingHour.id.toString()}>
+                      {new Date(workingHour.time).getUTCHours().toString().padStart(2, "0") +
+                        ":" +
+                        new Date(workingHour.time).getUTCMinutes().toString().padStart(2, "0")}
+                    </Option>
+                  );
+                })}
+              </Select>
             </div>
           </div>
         </DialogBody>
@@ -235,6 +303,14 @@ function Shift() {
             <span>Hapus</span>
           </Button>
         </DialogFooter>
+      </Dialog>
+
+      <Dialog open={openLoading} handler={handleOpenLoading}>
+        <DialogBody>
+          <div className="flex gap-2 items-center justify-center p-2">
+            <Spinner /> Sedang memuat data, mohon tunggu...
+          </div>
+        </DialogBody>
       </Dialog>
     </div>
   );
