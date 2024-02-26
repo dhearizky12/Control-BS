@@ -150,7 +150,7 @@ function Grammage() {
 
   const handleOpenLoading = () => setOpenLoading(!openLoading);
 
-  const handleSaveProduction = () => {
+  const handleSaveGrammage = () => {
     if (!target || !shift || !sample1 || !sample2 || !sample3 || !sample4) return;
 
     const url = "/api/grammages" + (updateData.id ? "/" + updateData.id : "");
@@ -183,7 +183,7 @@ function Grammage() {
       });
   };
 
-  const handleDeleteProduction = () => {
+  const handleDeleteGrammage = () => {
     if (!deleteData.id) return;
 
     setDeleteLoading(true);
@@ -358,7 +358,7 @@ function Grammage() {
           <Button variant="text" onClick={handleOpen} className="mr-3">
             <span>Batal</span>
           </Button>
-          <Button color="green" loading={saveLoading} onClick={handleSaveProduction}>
+          <Button color="green" loading={saveLoading} onClick={handleSaveGrammage}>
             <span>Simpan</span>
           </Button>
         </DialogFooter>
@@ -371,7 +371,7 @@ function Grammage() {
           <Button variant="text" onClick={handleOpenDelete} className="mr-3">
             <span>Batal</span>
           </Button>
-          <Button color="red" loading={deleteLoading} onClick={handleDeleteProduction}>
+          <Button color="red" loading={deleteLoading} onClick={handleDeleteGrammage}>
             <span>Hapus</span>
           </Button>
         </DialogFooter>

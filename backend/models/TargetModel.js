@@ -32,6 +32,6 @@ const Target = db.define(
 Product.hasMany(Target);
 Target.belongsTo(Product);
 
-Target.sync({ force: true });
+Target.sync();
 
 export default Target;

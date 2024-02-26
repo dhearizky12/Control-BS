@@ -15,23 +15,26 @@ import {
   PopoverContent,
   Select,
   Option,
+  Chip,
 } from "@material-tailwind/react";
 import { DayPicker } from "react-day-picker";
-import { PlusIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { PlusIcon, ChevronLeftIcon, ChevronRightIcon, CheckIcon } from "@heroicons/react/24/outline";
 import { format } from "date-fns";
 
 function Target() {
   const TABLE_HEAD = useRef(["Tanggal", "Nama Produk", "Target Produksi", "MID", "Status"]);
   const TABLE_STATUS = useRef(["Selesai", "Aktif"]);
+  const TABLE_STATUS_COLOR = useRef(["blue", "green"]);
 
   const [open, setOpen] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
+  const [openDone, setOpenDone] = useState(false);
   const [openLoading, setOpenLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [targetsData, setTargetsData] = useState([]);
   const [productsData, setProductsData] = useState([]);
 
-  const [hasActiveTarget, setHasActiveTarget] = useState(false);
+  const [activeTarget, setActiveTarget] = useState(false);
   const [mid, setMid] = useState("");
   const [date, setDate] = useState(new Date());
   const [product, setProduct] = useState("");
@@ -41,24 +44,28 @@ function Target() {
   const [deleteData, setDeleteData] = useState({});
   const [saveLoading, setSaveLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [doneLoading, setDoneLoading] = useState(false);
 
   const onMidChange = ({ target }) => setMid(target.value);
   const onTargetChange = ({ target }) => setTarget(target.value);
 
   const handleGetTargetData = useCallback(() => {
+    setLoading(true);
     return fetch("/api/targets", { method: "GET" })
       .then((response) => response.json())
       .then((responses) => {
         setLoading(false);
+        let activeTarget = responses.find((target) => target.status);
+        setActiveTarget(activeTarget);
 
-        setTargetsData(
-          responses.map((target) => {
+        let history = responses
+          .filter((target) => target.id !== activeTarget?.id)
+          .map((target) => {
             target.product = target.product.name;
-            target.date = new Date(target.date).toLocaleDateString();
 
             return target;
-          })
-        );
+          });
+        setTargetsData(history);
       })
       .catch((error) => {
         setLoading(false);
@@ -134,7 +141,9 @@ function Target() {
 
   const handleOpenLoading = () => setOpenLoading(!openLoading);
 
-  const handleSaveProduction = () => {
+  const handleOpenDone = () => setOpenDone(!openDone);
+
+  const handleSaveTarget = () => {
     if (!mid || !date || !product || !target) return;
 
     const url = "/api/targets" + (updateData.id ? "/" + updateData.id : "");
@@ -165,7 +174,7 @@ function Target() {
       });
   };
 
-  const handleDeleteProduction = () => {
+  const handleDeleteTarget = () => {
     if (!deleteData.id) return;
 
     setDeleteLoading(true);
@@ -182,68 +191,94 @@ function Target() {
       });
   };
 
+  const handleDoneTarget = () => {
+    if (!activeTarget.id) return;
+
+    setDoneLoading(true);
+    fetch("/api/targets/" + activeTarget.id, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        status: 0,
+      }),
+    })
+      .then((response) => response.json())
+      .then((response) => {
+        setDoneLoading(false);
+        handleOpenDone()
+        handleGetTargetData();
+      })
+      .catch((error) => {
+        setDoneLoading(false);
+        console.error("API Error:", error);
+      });
+  };
+
   return (
     <div className="h-full flex flex-col py-4 px-8">
       <div className="flex items-end gap-2 pb-4">
         <div className="flex-1">
           <div className="font-bold text-3xl">Target Aktif</div>
         </div>
-        {hasActiveTarget ? (
-          <div>Target Selesai</div>
+        {activeTarget ? (
+          <Button onClick={handleOpenDone} color="green" className="flex items-center gap-2">
+            <CheckIcon className="h-5 w-5" />
+            Target Selesai
+          </Button>
         ) : (
-          <div className="flex gap-3">
-            <Button onClick={handleOpen} className="flex items-center gap-2">
-              <PlusIcon className="h-5 w-5" />
-              Target Baru
-            </Button>
-          </div>
+          <Button onClick={handleOpen} className="flex items-center gap-2">
+            <PlusIcon className="h-5 w-5" />
+            Target Baru
+          </Button>
         )}
       </div>
-      {hasActiveTarget ? (
+      {activeTarget ? (
         <div className="grid grid-cols-4 gap-4">
-          <Card color="gray" variant="filled" shadow={false} className="border flex-1">
+          <Card className="border flex-1">
             <CardBody className="py-4 h-full flex flex-col justify-between">
-              <Typography variant="h6" className="font-bold">
-                Tanggal Produksi
-              </Typography>
+              <Typography className="font-bold">MID</Typography>
               <div>
-                <Typography className="font-bold flex gap-2 items-end text-3xl">8 Februari 2024</Typography>
+                <Typography className="font-bold flex gap-2 items-end text-2xl">{activeTarget.mid}</Typography>
               </div>
             </CardBody>
           </Card>
-          <Card color="gray" variant="filled" shadow={false} className="border flex-1">
+          <Card className="border flex-1">
             <CardBody className="py-4 h-full flex flex-col justify-between">
-              <Typography variant="h6" className="font-bold">
-                Nama Produk
-              </Typography>
+              <Typography className="font-bold">Tanggal Produksi</Typography>
               <div>
-                <Typography className="font-bold flex gap-2 items-end text-3xl">Giv Biru</Typography>
+                <Typography className="font-bold flex gap-2 items-end text-2xl">{format(activeTarget.date, "dd MMMM yyyy")}</Typography>
               </div>
             </CardBody>
           </Card>
-          <Card color="gray" variant="filled" shadow={false} className="border flex-1">
+          <Card className="border flex-1">
             <CardBody className="py-4 h-full flex flex-col justify-between">
-              <Typography variant="h6" className="font-bold">
-                Target Produksi
-              </Typography>
+              <Typography className="font-bold">Nama Produk</Typography>
               <div>
-                <Typography className="font-bold flex gap-2 items-end text-3xl">500 Box</Typography>
+                <Typography className="font-bold flex gap-2 items-end text-2xl">{activeTarget.product.name}</Typography>
               </div>
             </CardBody>
           </Card>
-          <Card color="gray" variant="filled" shadow={false} className="border flex-1">
+          <Card className="border flex-1">
             <CardBody className="py-4 h-full flex flex-col justify-between">
-              <Typography variant="h6" className="font-bold">
-                MID
-              </Typography>
+              <Typography className="font-bold">Target Produksi</Typography>
               <div>
-                <Typography className="font-bold flex gap-2 items-end text-3xl">PO23341231</Typography>
+                <Typography className="font-bold flex gap-2 items-end text-2xl">{activeTarget.target}</Typography>
               </div>
             </CardBody>
           </Card>
         </div>
       ) : (
-        <Card className="h-[95.6px] w-full flex items-center justify-center">Tidak Ada Target Aktif</Card>
+        <Card className="h-[91.6px] w-full flex items-center justify-center">
+          {loading ? (
+            <div className="flex gap-2 items-center justify-center">
+              <Spinner /> Memuat Data...
+            </div>
+          ) : (
+            "Tidak Ada Target Aktif"
+          )}
+        </Card>
       )}
 
       {/* TODO: ganti isi table */}
@@ -267,7 +302,7 @@ function Target() {
                     <div key={index} className="grid grid-cols-5 [&>div]:p-4 [&>div]:border-b [&>div]:border-blue-gray-50 -mr-[17px]">
                       <div>
                         <Typography color="blue-gray" className="font-bold">
-                          {date}
+                          {format(date, "dd MMMM yyyy")}
                         </Typography>
                       </div>
                       <div>
@@ -286,9 +321,7 @@ function Target() {
                         </Typography>
                       </div>
                       <div>
-                        <Typography color="blue-gray" className="font-normal">
-                          {TABLE_STATUS[status]}
-                        </Typography>
+                        <Chip value={TABLE_STATUS.current[status]} color={TABLE_STATUS_COLOR.current[status]} className="text-center" />
                       </div>
                     </div>
                   );
@@ -377,20 +410,20 @@ function Target() {
           <Button variant="text" onClick={handleOpen} className="mr-3">
             <span>Batal</span>
           </Button>
-          <Button color="green" loading={saveLoading} onClick={handleSaveProduction}>
+          <Button color="green" loading={saveLoading} onClick={handleSaveTarget}>
             <span>Simpan</span>
           </Button>
         </DialogFooter>
       </Dialog>
 
       <Dialog open={openDelete} handler={handleOpenDelete}>
-        <DialogHeader>Hapus Gramasi</DialogHeader>
-        <DialogBody>Apakah anda yakin ingin menghapus gramasi ini?</DialogBody>
+        <DialogHeader>Hapus Target</DialogHeader>
+        <DialogBody>Apakah anda yakin ingin menghapus target ini?</DialogBody>
         <DialogFooter>
           <Button variant="text" onClick={handleOpenDelete} className="mr-3">
             <span>Batal</span>
           </Button>
-          <Button color="red" loading={deleteLoading} onClick={handleDeleteProduction}>
+          <Button color="red" loading={deleteLoading} onClick={handleDeleteTarget}>
             <span>Hapus</span>
           </Button>
         </DialogFooter>
@@ -402,6 +435,19 @@ function Target() {
             <Spinner /> Sedang memuat data, mohon tunggu...
           </div>
         </DialogBody>
+      </Dialog>
+
+      <Dialog open={openDone} handler={handleOpenDone}>
+        <DialogHeader>Target Selesai</DialogHeader>
+        <DialogBody>Apakah anda yakin ingin target sudah selesai?</DialogBody>
+        <DialogFooter>
+          <Button variant="text" onClick={handleOpenDone} className="mr-3">
+            <span>Batal</span>
+          </Button>
+          <Button color="green" loading={doneLoading} onClick={handleDoneTarget}>
+            <span>Selesai</span>
+          </Button>
+        </DialogFooter>
       </Dialog>
     </div>
   );
