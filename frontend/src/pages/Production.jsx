@@ -107,12 +107,12 @@ function Production() {
   }, [handleGetProductionData]);
 
   const handleOpen = async ({ target }) => {
-    if(!open) {
+    if (!open) {
       setOpenLoading(true);
       await Promise.all([handleGetGroupData(), handleGetShiftData(), handleGetTargetData()]);
       setOpenLoading(false);
     }
-    
+
     if (target && target.dataset.id) {
       var data = productionsData.find((value) => value.id === Number(target.dataset.id));
       if (!data) return;
@@ -218,8 +218,8 @@ function Production() {
     <div className="h-full flex flex-col">
       <div className="py-4 px-8 flex items-end gap-2">
         <div className="flex-1">
-          <div className="text-gray-700">Tanggal</div>
-          <div className="font-bold text-3xl">08 Februari 2024</div>
+          <div className="text-gray-700">Target</div>
+          <div className="font-bold text-3xl">PO0042345</div>
         </div>
         <div>
           <Button onClick={handleOpen} className="flex items-center gap-2">
@@ -232,7 +232,7 @@ function Production() {
         <Card className="max-h-full h-fit w-full overflow-hidden flex flex-col">
           <div className="grid grid-cols-[repeat(8,_1fr)_auto] bg-black border-b border-blue-gray-100 ">
             {TABLE_HEAD.current.map((head, index) => (
-              <div key={head} className={"p-4" + (index === 8 ? ' w-[217.89px] mr-[17px]' : '')}>
+              <div key={head} className={"p-4" + (index === 8 ? " w-[217.89px] mr-[17px]" : "")}>
                 <Typography variant="small" color="white" className="font-bold leading-none text-md">
                   {head}
                 </Typography>
@@ -344,10 +344,15 @@ function Production() {
                 {shiftsData.map((shift, index) => {
                   return (
                     <Option key={index} value={shift.id.toString()}>
-                      {new Date(shift.time).getUTCHours().toString().padStart(2, "0") +
+                      {shift.name} (
+                      {new Date(shift.startWorkingHour.time).getUTCHours().toString().padStart(2, "0") +
                         ":" +
-                        new Date(shift.time).getUTCMinutes().toString().padStart(2, "0")}{" "}
-                      - {shift.name}
+                        new Date(shift.startWorkingHour.time).getUTCMinutes().toString().padStart(2, "0")}
+                      &#10240;-&#10240;
+                      {new Date(shift.endWorkingHour.time).getUTCHours().toString().padStart(2, "0") +
+                        ":" +
+                        new Date(shift.endWorkingHour.time).getUTCMinutes().toString().padStart(2, "0")}
+                      )
                     </Option>
                   );
                 })}

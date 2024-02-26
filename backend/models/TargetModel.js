@@ -19,6 +19,10 @@ const Target = db.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    status: {
+      type: DataTypes.INTEGER, // 1 is active, 0 is done/closed
+      defaultValue: 1,
+    },
   },
   {
     freezeTableName: true,
@@ -28,6 +32,6 @@ const Target = db.define(
 Product.hasMany(Target);
 Target.belongsTo(Product);
 
-Target.sync();
+Target.sync({ force: true });
 
 export default Target;

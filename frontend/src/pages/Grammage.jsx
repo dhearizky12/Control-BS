@@ -204,8 +204,8 @@ function Grammage() {
     <div className="h-full flex flex-col">
       <div className="py-4 px-8 flex items-end gap-2">
         <div className="flex-1">
-          <div className="text-gray-700">Tanggal</div>
-          <div className="font-bold text-3xl">08 Februari 2024</div>
+          <div className="text-gray-700">Target</div>
+          <div className="font-bold text-3xl">PO0042345</div>
         </div>
         <div>
           <Button onClick={handleOpen} className="flex items-center gap-2">
@@ -294,7 +294,7 @@ function Grammage() {
                 </Typography>
               </div>
               {averageSample.map((foot, index) => (
-                <div key={index + "-foot"} className={"border-blue-gray-100 p-4" + (index === 4? ' bg-green-500/60' : '')}>
+                <div key={index + "-foot"} className={"border-blue-gray-100 p-4" + (index === 4 ? " bg-green-500/60" : "")}>
                   <Typography color="white" className="font-bold leading-none text-md">
                     {foot} Kg
                   </Typography>
@@ -326,10 +326,15 @@ function Grammage() {
                 {shiftsData.map((shift, index) => {
                   return (
                     <Option key={index} value={shift.id.toString()}>
-                      {new Date(shift.time).getUTCHours().toString().padStart(2, "0") +
+                      {shift.name} (
+                      {new Date(shift.startWorkingHour.time).getUTCHours().toString().padStart(2, "0") +
                         ":" +
-                        new Date(shift.time).getUTCMinutes().toString().padStart(2, "0")}{" "}
-                      - {shift.name}
+                        new Date(shift.startWorkingHour.time).getUTCMinutes().toString().padStart(2, "0")}
+                      &#10240;-&#10240;
+                      {new Date(shift.endWorkingHour.time).getUTCHours().toString().padStart(2, "0") +
+                        ":" +
+                        new Date(shift.endWorkingHour.time).getUTCMinutes().toString().padStart(2, "0")}
+                      )
                     </Option>
                   );
                 })}
