@@ -55,12 +55,10 @@ function Production() {
   const onTargetChange = ({ target }) => setTempSelectedTargetId(target.value);
 
   const handleGetProductionData = useCallback((activeTarget) => {
-    console.log(activeTarget);
     if (!activeTarget?.id) return;
 
     setLoading(true);
-    let url = "/api/productions?targetId=" + activeTarget.id;
-    fetch(url, { method: "GET" })
+    fetch("/api/productions?targetId=" + activeTarget.id, { method: "GET" })
       .then((response) => response.json())
       .then((responses) => {
         setLoading(false);
@@ -70,12 +68,6 @@ function Production() {
             production.mid = production.target?.mid;
             production.group = production.group?.name;
             production.shift = production.shift?.name;
-            // if (production.shift?.time)
-            //   production.shift =
-            //     new Date(production.shift.time).getUTCHours().toString().padStart(2, "0") +
-            //     ":" +
-            //     new Date(production.shift.time).getUTCMinutes().toString().padStart(2, "0");
-
             return production;
           })
         );
@@ -91,6 +83,7 @@ function Production() {
       .then((response) => response.json())
       .then((responses) => {
         setLoading(false);
+        setOpenLoading(false);
         let activeTarget = responses.find((target) => target.status);
         if (activeTarget) {
           setSelectedTarget(activeTarget);
@@ -102,6 +95,7 @@ function Production() {
       })
       .catch((error) => {
         setLoading(false);
+        setOpenLoading(false);
         console.error("API Error:", error);
       });
   }, [handleGetProductionData]);
@@ -133,6 +127,7 @@ function Production() {
   }, []);
 
   useEffect(() => {
+    setOpenLoading(true);
     handleGetTargetData();
 
     return () => {};
@@ -314,7 +309,11 @@ function Production() {
             <Typography variant="small" color="white" className="font-bold leading-none text-md p-4">
               Hasil Produksi
             </Typography>
-            <Typography variant="small" color="white" className="font-bold leading-none text-md p-4">
+            <Typography
+              variant="small"
+              color="white"
+              className={"font-bold leading-none text-md p-4" + (!selectedTarget?.status ? " mr-[17px]" : "")}
+            >
               Waste
             </Typography>
             {!!selectedTarget?.status && (

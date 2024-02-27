@@ -1,9 +1,24 @@
 import React, { memo, useCallback, useEffect, useRef, useState } from "react";
-import { Card, Typography, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Input, Select, Option, Spinner } from "@material-tailwind/react";
-import { PlusIcon } from "@heroicons/react/24/outline";
+import {
+  Card,
+  Typography,
+  Button,
+  Dialog,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
+  Input,
+  Select,
+  Option,
+  Spinner,
+  Radio,
+} from "@material-tailwind/react";
+import { PlusIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
+import { format } from "date-fns";
 
 function Grammage() {
-  const TABLE_HEAD = useRef(["Waktu Shift", "Sample 1", "Sample 2", "Sample 3", "Sample 4", "Average", "Aksi"]);
+  const TARGET_STATUS = useRef(["Selesai", "Aktif"]); // TODO: move this into constan
+  const TARGET_STATUS_COLOR = useRef(["blue", "green"]); // TODO: move this into constan
 
   const [open, setOpen] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
@@ -14,7 +29,10 @@ function Grammage() {
   const [targetsData, setTargetsData] = useState([]);
   const [shiftsData, setShiftsData] = useState([]);
 
-  const [target, setTarget] = useState("");
+  const [selectedTarget, setSelectedTarget] = useState(null);
+  const [openTarget, setOpenTarget] = useState(false);
+  const [tempSelectedTargetId, setTempSelectedTargetId] = useState(null);
+
   const [shift, setShift] = useState("");
   const [sample1, setSample1] = useState("");
   const [sample2, setSample2] = useState("");
@@ -31,9 +49,13 @@ function Grammage() {
   const onSample3Change = ({ target }) => setSample3(target.value);
   const onSample4Change = ({ target }) => setSample4(target.value);
 
-  const handleGetGrammageData = useCallback(() => {
+  const onTargetChange = ({ target }) => setTempSelectedTargetId(target.value);
+
+  const handleGetGrammageData = useCallback((activeTarget) => {
+    if (!activeTarget?.id) return;
+
     setLoading(true);
-    fetch("/api/grammages", { method: "GET" })
+    fetch("/api/grammages?targetId=" + activeTarget.id, { method: "GET" })
       .then((responses) => responses.json())
       .then((responses) => {
         setLoading(false);
@@ -41,11 +63,7 @@ function Grammage() {
 
         setGrammagesData(
           responses.map((grammage) => {
-            if (grammage.shift?.time)
-              grammage.shift =
-                new Date(grammage.shift.time).getUTCHours().toString().padStart(2, "0") +
-                ":" +
-                new Date(grammage.shift.time).getUTCMinutes().toString().padStart(2, "0");
+            grammage.shift = grammage.shift.name;
 
             // calculate sample average
             averageSample[0] = averageSample[0] ? (averageSample[0] + grammage.sample1) / 2 : grammage.sample1;
@@ -69,15 +87,24 @@ function Grammage() {
   const handleGetTargetData = useCallback(() => {
     return fetch("/api/targets", { method: "GET" })
       .then((response) => response.json())
-      .then((response) => {
+      .then((responses) => {
         setLoading(false);
-        setTargetsData(response);
+        setOpenLoading(false);
+        let activeTarget = responses.find((target) => target.status);
+        if (activeTarget) {
+          setSelectedTarget(activeTarget);
+          setTempSelectedTargetId(activeTarget.id);
+        }
+
+        handleGetGrammageData(activeTarget);
+        setTargetsData(responses);
       })
       .catch((error) => {
         setLoading(false);
+        setOpenLoading(false);
         console.error("API Error:", error);
       });
-  }, []);
+  }, [handleGetGrammageData]);
 
   const handleGetShiftData = useCallback(() => {
     return fetch("/api/shifts", { method: "GET" })
@@ -93,10 +120,11 @@ function Grammage() {
   }, []);
 
   useEffect(() => {
-    handleGetGrammageData();
+    setOpenLoading(true);
+    handleGetTargetData();
 
     return () => {};
-  }, [handleGetGrammageData]);
+  }, [handleGetTargetData]);
 
   const handleOpen = async ({ target }) => {
     if (!open) {
@@ -109,7 +137,6 @@ function Grammage() {
       var data = grammagesData.find((value) => value.id === Number(target.dataset.id));
       if (!data) return;
 
-      setTarget(data.targetId.toString());
       setShift(data.shiftId.toString());
       setSample1(data.sample1);
       setSample2(data.sample2);
@@ -119,7 +146,6 @@ function Grammage() {
     }
 
     if (open) {
-      setTarget("");
       setShift("");
       setSample1("");
       setSample2("");
@@ -150,8 +176,10 @@ function Grammage() {
 
   const handleOpenLoading = () => setOpenLoading(!openLoading);
 
+  const handleOpenTarget = () => setOpenTarget(!openTarget);
+
   const handleSaveGrammage = () => {
-    if (!target || !shift || !sample1 || !sample2 || !sample3 || !sample4) return;
+    if (!selectedTarget.id || !shift || !sample1 || !sample2 || !sample3 || !sample4) return;
 
     const url = "/api/grammages" + (updateData.id ? "/" + updateData.id : "");
     const method = updateData.id ? "PATCH" : "POST";
@@ -163,7 +191,7 @@ function Grammage() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        targetId: target,
+        targetId: selectedTarget.id,
         shiftId: shift,
         sample1,
         sample2,
@@ -175,7 +203,7 @@ function Grammage() {
       .then((response) => {
         setSaveLoading(false);
         handleOpen({});
-        handleGetGrammageData();
+        handleGetGrammageData(selectedTarget);
       })
       .catch((error) => {
         setSaveLoading(false);
@@ -192,7 +220,7 @@ function Grammage() {
       .then((response) => {
         setSaveLoading(false);
         handleOpenDelete({});
-        handleGetGrammageData();
+        handleGetGrammageData(selectedTarget);
       })
       .catch((error) => {
         setSaveLoading(false);
@@ -200,30 +228,78 @@ function Grammage() {
       });
   };
 
+  const handleSelectTarget = () => {
+    let selected = targetsData.find((target) => target.id === Number(tempSelectedTargetId));
+    setSelectedTarget(selected);
+    setTempSelectedTargetId(selected.id);
+    handleGetGrammageData(selected);
+    handleOpenTarget();
+  };
+
   return (
     <div className="h-full flex flex-col">
       <div className="py-4 px-8 flex items-end gap-2">
-        <div className="flex-1">
-          <div className="text-gray-700">Target</div>
-          <div className="font-bold text-3xl">PO0042345</div>
+        <div className="cursor-pointer pr-4" onClick={handleOpenTarget}>
+          <Typography className="text-gray-700">Target</Typography>
+          {selectedTarget ? (
+            <div>
+              <div className="flex gap-4 items-center">
+                <Typography className="font-bold text-3xl">{selectedTarget.mid}</Typography>
+                <ChevronDownIcon className="h-5 w-5" />
+              </div>
+              <div className="flex gap-2">
+                <Typography>{format(selectedTarget.date, "dd MMMM yyyy")} - </Typography>
+                <Typography color={TARGET_STATUS_COLOR.current[selectedTarget.status]}>{TARGET_STATUS.current[selectedTarget.status]}</Typography>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <div className="flex gap-4 items-center">
+                <Typography className="font-bold text-3xl">Tidak Ada Target</Typography>
+                <ChevronDownIcon className="h-5 w-5" />
+              </div>
+              <Typography>Klik untuk memilih target</Typography>
+            </div>
+          )}
         </div>
-        <div>
-          <Button onClick={handleOpen} className="flex items-center gap-2">
-            <PlusIcon className="h-5 w-5" />
-            Tambah Gramasi
-          </Button>
-        </div>
+        <div className="flex-1"></div>
+        {selectedTarget && !!selectedTarget.status && (
+          <div>
+            <Button onClick={handleOpen} className="flex items-center gap-2">
+              <PlusIcon className="h-5 w-5" />
+              Tambah Gramasi
+            </Button>
+          </div>
+        )}
       </div>
       <div className="flex-1 w-full overflow-hidden pb-4 px-8">
         <Card className="max-h-full h-fit w-full overflow-hidden flex flex-col">
           <div className="grid grid-cols-[repeat(7,_1fr)_auto] bg-black border-b border-blue-gray-100 ">
-            {TABLE_HEAD.current.map((head, index) => (
-              <div key={head} className={"p-4" + (index === 6 ? " w-[217.89px] mr-[17px]" : "")}>
-                <Typography variant="small" color="white" className="font-bold leading-none text-md">
-                  {head}
-                </Typography>
-              </div>
-            ))}
+            <Typography variant="small" color="white" className="font-bold leading-none text-md p-4">
+              Waktu Shift
+            </Typography>
+            <Typography variant="small" color="white" className="font-bold leading-none text-md p-4">
+              Sample 1
+            </Typography>
+            <Typography variant="small" color="white" className="font-bold leading-none text-md p-4">
+              Sample 2
+            </Typography>
+            <Typography variant="small" color="white" className="font-bold leading-none text-md p-4">
+              Sample 3
+            </Typography>
+            <Typography variant="small" color="white" className="font-bold leading-none text-md p-4">
+              Sample 4
+            </Typography>
+            <Typography
+              variant="small"
+              color="white"
+              className={"font-bold leading-none text-md p-4" + (!selectedTarget?.status? " mr-[17px]" : "")}
+            >
+              Average
+            </Typography>
+            <Typography variant="small" color="white" className="font-bold leading-none text-md p-4 w-[217.89px] mr-[17px]">
+              Aksi
+            </Typography>
           </div>
           <div className="overflow-y-auto overflow-x-hidden gutter-stable">
             {grammagesData.length ? (
@@ -310,16 +386,8 @@ function Grammage() {
         <DialogHeader>{updateData.id ? "Ubah" : "Tambah"} Gramasi</DialogHeader>
         <DialogBody>
           <div className="grid grid-cols-2 gap-4">
-            <div className="mb-1">
-              <Select label="Target" size="lg" placeholder="Pilih Target" value={target} onChange={setTarget}>
-                {targetsData.map((target, index) => {
-                  return (
-                    <Option key={index} value={target.id.toString()}>
-                      {target.mid} - {target.target} Box
-                    </Option>
-                  );
-                })}
-              </Select>
+            <div className="mb-1 pointer-events-none">
+              <Input label="Target" size="lg" value={selectedTarget?.mid} readOnly className="!bg-gray-200" />
             </div>
             <div className="mb-1">
               <Select label="Shift" size="lg" placeholder="Pilih Shift" value={shift} onChange={setShift}>
@@ -383,6 +451,39 @@ function Grammage() {
             <Spinner /> Sedang memuat data, mohon tunggu...
           </div>
         </DialogBody>
+      </Dialog>
+
+      <Dialog open={openTarget} handler={handleOpenTarget}>
+        <DialogHeader>Pilih Target</DialogHeader>
+        <DialogBody>
+          <div className="[&>div]:!grid [&>div]:!grid-cols-[auto_1fr] [&>div]:border [&>div]:p-2 [&>div]:rounded [&>div]:mb-3 ">
+            {targetsData.map((target, index) => {
+              return (
+                <Radio
+                  key={index}
+                  name="target"
+                  value={target.id}
+                  defaultChecked={target.id === tempSelectedTargetId}
+                  label={
+                    <div className="flex gap-2">
+                      <Typography>{target.mid + " - " + format(target.date, "dd MMMM yyyy") + " - "}</Typography>
+                      <Typography color={TARGET_STATUS_COLOR.current[target.status]}>{TARGET_STATUS.current[target.status]}</Typography>
+                    </div>
+                  }
+                  onChange={onTargetChange}
+                />
+              );
+            })}
+          </div>
+        </DialogBody>
+        <DialogFooter>
+          <Button variant="text" onClick={handleOpenTarget} className="mr-3">
+            <span>Batal</span>
+          </Button>
+          <Button onClick={handleSelectTarget}>
+            <span>Pilih</span>
+          </Button>
+        </DialogFooter>
       </Dialog>
     </div>
   );
