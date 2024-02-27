@@ -8,6 +8,7 @@ export const getGrammages = async (req, res) => {
   try {
     const response = await Grammage.findAll({
       where: req.query,
+      order: [["createdAt", "DESC"]],
       include: [Shift, Target, WorkingHour],
     });
     res.status(200).json(response);

@@ -3,7 +3,7 @@ import path from "path";
 
 const envVars = process.env;
 const envPath = [".env.development.local"];
-// if (envVars.NODE_ENV == "production") path = [".env"];
+if (envVars.NODE_ENV == "production") path = [".env"];
 
 dotenv.config({ path: envPath });
 

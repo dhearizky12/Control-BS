@@ -18,7 +18,7 @@ import {
   Chip,
 } from "@material-tailwind/react";
 import { DayPicker } from "react-day-picker";
-import { PlusIcon, ChevronLeftIcon, ChevronRightIcon, CheckIcon } from "@heroicons/react/24/outline";
+import { PlusIcon, ChevronLeftIcon, ChevronRightIcon, CheckIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import { format } from "date-fns";
 
 function Target() {
@@ -36,7 +36,7 @@ function Target() {
 
   const [activeTarget, setActiveTarget] = useState(false);
   const [mid, setMid] = useState("");
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState("");
   const [product, setProduct] = useState("");
   const [target, setTarget] = useState(0);
 
@@ -100,15 +100,14 @@ function Target() {
     }
 
     if (target && target.dataset.id) {
-      var data = targetsData.find((value) => value.id === Number(target.dataset.id));
-      if (!data) return;
+      if (!activeTarget.id) return;
 
-      setMid(data.mid);
-      setDate(data.date);
-      setProduct(date.productId.toString());
-      setTarget(data.target);
+      setMid(activeTarget.mid);
+      setDate(activeTarget.date);
+      setProduct(activeTarget.productId.toString());
+      setTarget(activeTarget.target);
 
-      setUpdateData(data);
+      setUpdateData(activeTarget);
     }
 
     if (open) {
@@ -223,10 +222,16 @@ function Target() {
           <div className="font-bold text-3xl">Target Aktif</div>
         </div>
         {activeTarget ? (
-          <Button onClick={handleOpenDone} color="green" className="flex items-center gap-2">
-            <CheckIcon className="h-5 w-5" />
-            Target Selesai
-          </Button>
+          <div className="flex gap-4">
+            <Button onClick={handleOpenDone} color="green" className="flex items-center gap-2">
+              <CheckIcon className="h-5 w-5" />
+              Target Selesai
+            </Button>
+            <Button data-id={activeTarget.id}  onClick={handleOpen} variant="outlined" className="flex items-center gap-2">
+              <PencilSquareIcon className="h-5 w-5" />
+              Ubah Target
+            </Button>
+          </div>
         ) : (
           <Button onClick={handleOpen} className="flex items-center gap-2">
             <PlusIcon className="h-5 w-5" />
@@ -342,7 +347,7 @@ function Target() {
       </div>
 
       <Dialog open={open} handler={handleOpen}>
-        <DialogHeader>Add Target</DialogHeader>
+        <DialogHeader>{updateData?.id? 'Ubah' : 'Tambah'} Target</DialogHeader>
         <DialogBody>
           <div className="grid grid-cols-2 gap-4">
             <div className="mb-1">
@@ -351,7 +356,7 @@ function Target() {
             <div className="mb-1 [&>div]:h-full">
               <Popover placement="bottom">
                 <PopoverHandler>
-                  <Input label="Tanggal" onChange={() => null} value={date ? format(date, "PPP") : ""} />
+                  <Input label="Tanggal" onChange={() => null} value={date ? format(date, "dd MMMM yyyy") : ""} />
                 </PopoverHandler>
                 <PopoverContent className="z-[9999]">
                   <DayPicker

@@ -2,12 +2,13 @@ import Production from "../models/ProductionModel.js";
 import Group from "../models/GroupModel.js";
 import Shift from "../models/ShiftModel.js";
 import Target from "../models/TargetModel.js";
-import WorkingHour from '../models/WorkingHourModel.js';
+import WorkingHour from "../models/WorkingHourModel.js";
 
 export const getProductions = async (req, res) => {
   try {
     const response = await Production.findAll({
       where: req.query,
+      order: [["createdAt", "DESC"]],
       include: [
         Group,
         {

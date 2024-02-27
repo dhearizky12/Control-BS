@@ -377,7 +377,7 @@ function Grammage() {
                     </div>
                     <div className="p-4 border-b !border-white bg-blue-gray-50 flex items-center">
                       <Typography color="blue-gray" className="font-bold">
-                        {average} Kg
+                        {(average).toFixed(3)} Kg
                       </Typography>
                     </div>
                     <div className="flex gap-3 w-[217.89px] mr-[17px]">
@@ -410,10 +410,10 @@ function Grammage() {
                   Average
                 </Typography>
               </div>
-              {averageSample.map((foot, index) => (
+              {averageSample.map((average, index) => (
                 <div key={index + "-foot"} className={"border-blue-gray-100 p-4" + (index === 4 ? " bg-green-500/60" : "")}>
                   <Typography color="white" className="font-bold leading-none text-md">
-                    {foot} Kg
+                    {(average).toFixed(3)} Kg
                   </Typography>
                 </div>
               ))}
