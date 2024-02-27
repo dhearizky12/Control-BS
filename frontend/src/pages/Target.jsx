@@ -281,9 +281,8 @@ function Target() {
         </Card>
       )}
 
-      {/* TODO: ganti isi table */}
-      <div className="mt-6">
-        <div className="font-bold text-3xl mb-3">History Target</div>
+      <div className="mt-12">
+        <div className="font-bold text-xl mb-3">History Target</div>
         <div className="flex-1 w-full overflow-hidden pb-4">
           <Card className="max-h-full h-fit w-full overflow-hidden flex flex-col">
             <div className="grid grid-cols-5 bg-black border-b border-blue-gray-100 ">

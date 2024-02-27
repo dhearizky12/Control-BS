@@ -1,9 +1,24 @@
 import React, { memo, useCallback, useEffect, useRef, useState } from "react";
-import { Card, Typography, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Input, Spinner, Select, Option } from "@material-tailwind/react";
-import { PlusIcon } from "@heroicons/react/24/outline";
+import {
+  Card,
+  Typography,
+  Button,
+  Dialog,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
+  Input,
+  Spinner,
+  Select,
+  Option,
+  Radio,
+} from "@material-tailwind/react";
+import { PlusIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
+import { format } from "date-fns";
 
 function Production() {
-  const TABLE_HEAD = useRef(["MID", "Group", "Shift", "Hasil Adukan", "Tambahan BS", "Gramasi", "Hasil Produksi", "Waste", "Aksi"]);
+  const TARGET_STATUS = useRef(["Selesai", "Aktif"]); // TODO: move this into constan
+  const TARGET_STATUS_COLOR = useRef(["blue", "green"]); // TODO: move this into constan
 
   const [open, setOpen] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
@@ -14,7 +29,10 @@ function Production() {
   const [groupsData, setGroupsData] = useState([]);
   const [shiftsData, setShiftsData] = useState([]);
 
-  const [target, setTarget] = useState("");
+  const [selectedTarget, setSelectedTarget] = useState(null);
+  const [openTarget, setOpenTarget] = useState(false);
+  const [tempSelectedTargetId, setTempSelectedTargetId] = useState(null);
+
   const [group, setGroup] = useState("");
   const [shift, setShift] = useState("");
   const [mixResult, setMixResult] = useState("");
@@ -34,9 +52,15 @@ function Production() {
   const onResultChange = ({ target }) => setResult(target.value);
   const onWasteChange = ({ target }) => setWaste(target.value);
 
-  const handleGetProductionData = useCallback(() => {
+  const onTargetChange = ({ target }) => setTempSelectedTargetId(target.value);
+
+  const handleGetProductionData = useCallback((activeTarget) => {
+    console.log(activeTarget);
+    if (!activeTarget?.id) return;
+
     setLoading(true);
-    fetch("/api/productions", { method: "GET" })
+    let url = "/api/productions?targetId=" + activeTarget.id;
+    fetch(url, { method: "GET" })
       .then((response) => response.json())
       .then((responses) => {
         setLoading(false);
@@ -45,11 +69,12 @@ function Production() {
           responses.map((production) => {
             production.mid = production.target?.mid;
             production.group = production.group?.name;
-            if (production.shift?.time)
-              production.shift =
-                new Date(production.shift.time).getUTCHours().toString().padStart(2, "0") +
-                ":" +
-                new Date(production.shift.time).getUTCMinutes().toString().padStart(2, "0");
+            production.shift = production.shift?.name;
+            // if (production.shift?.time)
+            //   production.shift =
+            //     new Date(production.shift.time).getUTCHours().toString().padStart(2, "0") +
+            //     ":" +
+            //     new Date(production.shift.time).getUTCMinutes().toString().padStart(2, "0");
 
             return production;
           })
@@ -64,15 +89,22 @@ function Production() {
   const handleGetTargetData = useCallback(() => {
     return fetch("/api/targets", { method: "GET" })
       .then((response) => response.json())
-      .then((response) => {
+      .then((responses) => {
         setLoading(false);
-        setTargetsData(response);
+        let activeTarget = responses.find((target) => target.status);
+        if (activeTarget) {
+          setSelectedTarget(activeTarget);
+          setTempSelectedTargetId(activeTarget.id);
+        }
+
+        handleGetProductionData(activeTarget);
+        setTargetsData(responses);
       })
       .catch((error) => {
         setLoading(false);
         console.error("API Error:", error);
       });
-  }, []);
+  }, [handleGetProductionData]);
 
   const handleGetGroupData = useCallback(() => {
     return fetch("/api/groups", { method: "GET" })
@@ -101,10 +133,10 @@ function Production() {
   }, []);
 
   useEffect(() => {
-    handleGetProductionData();
+    handleGetTargetData();
 
     return () => {};
-  }, [handleGetProductionData]);
+  }, [handleGetTargetData]);
 
   const handleOpen = async ({ target }) => {
     if (!open) {
@@ -117,7 +149,6 @@ function Production() {
       var data = productionsData.find((value) => value.id === Number(target.dataset.id));
       if (!data) return;
 
-      setTarget(data.targetId.toString());
       setGroup(data.groupId.toString());
       setShift(data.shiftId.toString());
       setMixResult(data.mixResult);
@@ -129,7 +160,6 @@ function Production() {
     }
 
     if (open) {
-      setTarget("");
       setGroup("");
       setShift("");
       setMixResult("");
@@ -162,8 +192,10 @@ function Production() {
 
   const handleOpenLoading = () => setOpenLoading(!openLoading);
 
+  const handleOpenTarget = () => setOpenTarget(!openTarget);
+
   const handleSaveProduction = () => {
-    if (!target || !group || !shift || !mixResult || !additionBS || !grammage || !result || !waste) return;
+    if (!selectedTarget.id || !group || !shift || !mixResult || !additionBS || !grammage || !result || !waste) return;
 
     const url = "/api/productions" + (updateData.id ? "/" + updateData.id : "");
     const method = updateData.id ? "PATCH" : "POST";
@@ -175,7 +207,7 @@ function Production() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        targetId: target,
+        targetId: selectedTarget.id,
         groupId: group,
         shiftId: shift,
         mixResult,
@@ -189,7 +221,7 @@ function Production() {
       .then((response) => {
         setSaveLoading(false);
         handleOpen({});
-        handleGetProductionData();
+        handleGetProductionData(selectedTarget);
       })
       .catch((error) => {
         setSaveLoading(false);
@@ -206,7 +238,7 @@ function Production() {
       .then((response) => {
         setSaveLoading(false);
         handleOpenDelete({});
-        handleGetProductionData();
+        handleGetProductionData(selectedTarget);
       })
       .catch((error) => {
         setSaveLoading(false);
@@ -214,30 +246,82 @@ function Production() {
       });
   };
 
+  const handleSelectTarget = () => {
+    let selected = targetsData.find((target) => target.id === Number(tempSelectedTargetId));
+    setSelectedTarget(selected);
+    setTempSelectedTargetId(selected.id);
+    handleGetProductionData(selected);
+    handleOpenTarget();
+  };
+
   return (
     <div className="h-full flex flex-col">
       <div className="py-4 px-8 flex items-end gap-2">
-        <div className="flex-1">
-          <div className="text-gray-700">Target</div>
-          <div className="font-bold text-3xl">PO0042345</div>
+        <div className="cursor-pointer pr-4" onClick={handleOpenTarget}>
+          <Typography className="text-gray-700">Target</Typography>
+          {selectedTarget ? (
+            <div>
+              <div className="flex gap-4 items-center">
+                <Typography className="font-bold text-3xl">{selectedTarget.mid}</Typography>
+                <ChevronDownIcon className="h-5 w-5" />
+              </div>
+              <div className="flex gap-2">
+                <Typography>{format(selectedTarget.date, "dd MMMM yyyy")} - </Typography>
+                <Typography color={TARGET_STATUS_COLOR.current[selectedTarget.status]}>{TARGET_STATUS.current[selectedTarget.status]}</Typography>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <div className="flex gap-4 items-center">
+                <Typography className="font-bold text-3xl">Tidak Ada Target</Typography>
+                <ChevronDownIcon className="h-5 w-5" />
+              </div>
+              <Typography>Klik untuk memilih target</Typography>
+            </div>
+          )}
         </div>
-        <div>
-          <Button onClick={handleOpen} className="flex items-center gap-2">
-            <PlusIcon className="h-5 w-5" />
-            Tambah Produksi
-          </Button>
-        </div>
+        <div className="flex-1"></div>
+        {selectedTarget && !!selectedTarget.status && (
+          <div>
+            <Button onClick={handleOpen} className="flex items-center gap-2">
+              <PlusIcon className="h-5 w-5" />
+              Tambah Produksi
+            </Button>
+          </div>
+        )}
       </div>
       <div className="flex-1 w-full overflow-hidden pb-4 px-8">
         <Card className="max-h-full h-fit w-full overflow-hidden flex flex-col">
           <div className="grid grid-cols-[repeat(8,_1fr)_auto] bg-black border-b border-blue-gray-100 ">
-            {TABLE_HEAD.current.map((head, index) => (
-              <div key={head} className={"p-4" + (index === 8 ? " w-[217.89px] mr-[17px]" : "")}>
-                <Typography variant="small" color="white" className="font-bold leading-none text-md">
-                  {head}
-                </Typography>
-              </div>
-            ))}
+            <Typography variant="small" color="white" className="font-bold leading-none text-md p-4">
+              MID
+            </Typography>
+            <Typography variant="small" color="white" className="font-bold leading-none text-md p-4">
+              Group
+            </Typography>
+            <Typography variant="small" color="white" className="font-bold leading-none text-md p-4">
+              Shift
+            </Typography>
+            <Typography variant="small" color="white" className="font-bold leading-none text-md p-4">
+              Hasil Adukan
+            </Typography>
+            <Typography variant="small" color="white" className="font-bold leading-none text-md p-4">
+              Tambahan BS
+            </Typography>
+            <Typography variant="small" color="white" className="font-bold leading-none text-md p-4">
+              Gramasi
+            </Typography>
+            <Typography variant="small" color="white" className="font-bold leading-none text-md p-4">
+              Hasil Produksi
+            </Typography>
+            <Typography variant="small" color="white" className="font-bold leading-none text-md p-4">
+              Waste
+            </Typography>
+            {!!selectedTarget?.status && (
+              <Typography variant="small" color="white" className="font-bold leading-none text-md p-4 w-[217.89px] mr-[17px]">
+                Aksi
+              </Typography>
+            )}
           </div>
           <div className="overflow-y-auto gutter-stable">
             {productionsData.length ? (
@@ -287,14 +371,16 @@ function Production() {
                         {waste} Kg
                       </Typography>
                     </div>
-                    <div className="flex gap-3 w-[217.89px] mr-[17px]">
-                      <Button variant="outlined" color="red" data-id={id} onClick={handleOpenDelete}>
-                        Hapus
-                      </Button>
-                      <Button variant="outlined" data-id={id} onClick={handleOpen}>
-                        Ubah
-                      </Button>
-                    </div>
+                    {!!selectedTarget?.status && (
+                      <div className="flex gap-3 w-[217.89px] mr-[17px]">
+                        <Button variant="outlined" color="red" data-id={id} onClick={handleOpenDelete}>
+                          Hapus
+                        </Button>
+                        <Button variant="outlined" data-id={id} onClick={handleOpen}>
+                          Ubah
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 );
               })
@@ -317,16 +403,8 @@ function Production() {
         <DialogHeader>{updateData.id ? "Ubah" : "Tambah"} Produksi</DialogHeader>
         <DialogBody>
           <div className="grid grid-cols-2 gap-4">
-            <div className="mb-1">
-              <Select label="Target" size="lg" placeholder="Pilih Target" value={target} onChange={setTarget}>
-                {targetsData.map((target, index) => {
-                  return (
-                    <Option key={index} value={target.id.toString()}>
-                      {target.mid} - {target.target} Box
-                    </Option>
-                  );
-                })}
-              </Select>
+            <div className="mb-1 pointer-events-none">
+              <Input label="Target" size="lg" value={selectedTarget?.mid} readOnly className="!bg-gray-200" />
             </div>
             <div className="mb-1">
               <Select label="Group" size="lg" placeholder="Pilih Group" value={group} onChange={setGroup}>
@@ -404,6 +482,39 @@ function Production() {
             <Spinner /> Sedang memuat data, mohon tunggu...
           </div>
         </DialogBody>
+      </Dialog>
+
+      <Dialog open={openTarget} handler={handleOpenTarget}>
+        <DialogHeader>Pilih Target</DialogHeader>
+        <DialogBody>
+          <div className="[&>div]:!grid [&>div]:!grid-cols-[auto_1fr] [&>div]:border [&>div]:p-2 [&>div]:rounded [&>div]:mb-3 ">
+            {targetsData.map((target, index) => {
+              return (
+                <Radio
+                  key={index}
+                  name="target"
+                  value={target.id}
+                  defaultChecked={target.id === tempSelectedTargetId}
+                  label={
+                    <div className="flex gap-2">
+                      <Typography>{target.mid + " - " + format(target.date, "dd MMMM yyyy") + " - "}</Typography>
+                      <Typography color={TARGET_STATUS_COLOR.current[target.status]}>{TARGET_STATUS.current[target.status]}</Typography>
+                    </div>
+                  }
+                  onChange={onTargetChange}
+                />
+              );
+            })}
+          </div>
+        </DialogBody>
+        <DialogFooter>
+          <Button variant="text" onClick={handleOpenTarget} className="mr-3">
+            <span>Batal</span>
+          </Button>
+          <Button onClick={handleSelectTarget}>
+            <span>Pilih</span>
+          </Button>
+        </DialogFooter>
       </Dialog>
     </div>
   );
