@@ -46,6 +46,20 @@ function Grammage() {
   const [saveLoading, setSaveLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
+  const onShiftChange = (value, shifts, workingHours) => {
+    if (!shifts) shifts = shiftsData;
+    if (!workingHours) workingHours = workingHoursData;
+    let selectedShift = shifts.find((s) => s.id === Number(value));
+    let selectableWorkingHours = workingHours.map((workingHour) => {
+      workingHour.show =
+        selectedShift && workingHour.time >= selectedShift.startWorkingHour.time && workingHour.time <= selectedShift.endWorkingHour.time;
+      return workingHour;
+    });
+
+    setWorkingHourssData(selectableWorkingHours);
+    setWorkingHour("");
+    setShift(value);
+  };
   const onSample1Change = ({ target }) => setSample1(target.value);
   const onSample2Change = ({ target }) => setSample2(target.value);
   const onSample3Change = ({ target }) => setSample3(target.value);
@@ -114,6 +128,7 @@ function Grammage() {
       .then((response) => {
         setLoading(false);
         setShiftsData(response);
+        return response;
       })
       .catch((error) => {
         setLoading(false);
@@ -127,6 +142,8 @@ function Grammage() {
       .then((response) => {
         setLoading(false);
         setWorkingHourssData(response);
+
+        return response;
       })
       .catch((error) => {
         setLoading(false);
@@ -142,9 +159,11 @@ function Grammage() {
   }, [handleGetTargetData]);
 
   const handleOpen = async ({ target }) => {
+    let result = [];
+
     if (!open) {
       setOpenLoading(true);
-      await Promise.all([handleGetShiftData(), handleGetWorkingHourData()]);
+      result = await Promise.all([handleGetShiftData(), handleGetWorkingHourData()]);
       setOpenLoading(false);
     }
 
@@ -152,8 +171,8 @@ function Grammage() {
       var data = grammagesData.find((value) => value.id === Number(target.dataset.id));
       if (!data) return;
 
-      setShift(data.shiftId.toString());
-      setWorkingHour(data.workingId.toString());
+      onShiftChange(data.shiftId.toString(), result[0], result[1]);
+      setWorkingHour(data.workingHourId.toString());
       setSample1(data.sample1);
       setSample2(data.sample2);
       setSample3(data.sample3);
@@ -162,7 +181,7 @@ function Grammage() {
     }
 
     if (open) {
-      setShift("");
+      onShiftChange("");
       setWorkingHour("");
       setSample1("");
       setSample2("");
@@ -412,7 +431,7 @@ function Grammage() {
               <Input label="Target" size="lg" value={selectedTarget?.mid} readOnly className="!bg-gray-200" />
             </div>
             <div className="mb-1">
-              <Select label="Shift" size="lg" placeholder="Pilih Shift" value={shift} onChange={setShift}>
+              <Select label="Shift" size="lg" placeholder="Pilih Shift" value={shift} onChange={onShiftChange}>
                 {shiftsData.map((shift, index) => {
                   return (
                     <Option key={index} value={shift.id.toString()}>
@@ -432,23 +451,15 @@ function Grammage() {
             </div>
             <div className="mb-1">
               <Select label="Jam Kerja" size="lg" placeholder="Pilih Jam Kerja" value={workingHour} onChange={setWorkingHour}>
-                {workingHoursData
-                  .filter((workingHour) => {
-                    let selectedShift = shiftsData.find((s) => s.id === Number(shift));
-                    if (selectedShift) {
-                      return workingHour.time >= selectedShift.startWorkingHour.time && workingHour.time <= selectedShift.endWorkingHour.time;
-                    }
-                    return false;
-                  })
-                  .map((workingHour, index) => {
-                    return (
-                      <Option key={index} value={workingHour.id.toString()}>
-                        {new Date(workingHour.time).getUTCHours().toString().padStart(2, "0") +
-                          ":" +
-                          new Date(workingHour.time).getUTCMinutes().toString().padStart(2, "0")}
-                      </Option>
-                    );
-                  })}
+                {workingHoursData.map((workingHour, index) => {
+                  return (
+                    <Option key={workingHour.id} value={workingHour.id.toString()} className={workingHour.show ? "show" : "hidden"}>
+                      {new Date(workingHour.time).getUTCHours().toString().padStart(2, "0") +
+                        ":" +
+                        new Date(workingHour.time).getUTCMinutes().toString().padStart(2, "0")}
+                    </Option>
+                  );
+                })}
               </Select>
             </div>
             <div></div>
