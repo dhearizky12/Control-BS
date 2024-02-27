@@ -49,6 +49,4 @@ Production.belongsTo(Shift);
 Target.hasMany(Production);
 Production.belongsTo(Target);
 
-Production.sync();
-
 export default Production;

@@ -17,6 +17,4 @@ const Product = db.define(
   }
 );
 
-Product.sync();
-
 export default Product;

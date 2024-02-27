@@ -1,8 +1,11 @@
 import dotenv from "dotenv";
 import path from "path";
 
-dotenv.config({ path: [".env.development.local", ".env"] });
 const envVars = process.env;
+const envPath = [".env"];
+if (envVars.NODE_ENV == "developement") path.push(".env.development.local");
+
+dotenv.config({ path: envPath });
 
 const Config = {
   env: envVars.NODE_ENV,

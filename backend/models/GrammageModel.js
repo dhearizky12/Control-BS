@@ -46,6 +46,4 @@ Grammage.belongsTo(Shift);
 WorkingHour.hasMany(Grammage);
 Grammage.belongsTo(WorkingHour);
 
-Grammage.sync();
-
 export default Grammage;

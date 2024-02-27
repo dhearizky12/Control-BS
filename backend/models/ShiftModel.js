@@ -21,7 +21,4 @@ const Shift = db.define(
 Shift.belongsTo(WorkingHour, { as: 'startWorkingHour', foreignKey: 'startWorkingHourId' });
 Shift.belongsTo(WorkingHour, { as: 'endWorkingHour', foreignKey: 'endWorkingHourId' });
 
-
-Shift.sync();
-
 export default Shift;

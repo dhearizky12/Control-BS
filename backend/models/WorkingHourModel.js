@@ -17,6 +17,4 @@ const WorkingHour = db.define(
   }
 );
 
-WorkingHour.sync();
-
 export default WorkingHour;

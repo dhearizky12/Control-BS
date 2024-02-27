@@ -11,6 +11,8 @@ import TargetRoute from "./routes/TargetRoute.js";
 import ProductionRoute from "./routes/ProductionRoute.js";
 import GrammageRoute from "./routes/GrammageRoute.js";
 
+import db from "./config/Database.js";
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -26,7 +28,9 @@ apiRouter.use(TargetRoute);
 apiRouter.use(ProductionRoute);
 apiRouter.use(GrammageRoute);
 
-app.use('/api', apiRouter);
+await db.sync();
+
+app.use("/api", apiRouter);
 
 app.use(express.static(Config.publicFolder));
 app.get("*", function (req, res) {

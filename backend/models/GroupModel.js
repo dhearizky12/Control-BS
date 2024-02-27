@@ -17,6 +17,4 @@ const Group = db.define(
   }
 );
 
-Group.sync();
-
 export default Group;
