@@ -32,7 +32,17 @@ export const getProductionsById = async (req, res) => {
       where: {
         id: req.params.id,
       },
-      include: [Group, Shift, Target],
+      include: [
+        Group,
+        {
+          model: Shift,
+          include: [
+            { model: WorkingHour, as: "startWorkingHour" },
+            { model: WorkingHour, as: "endWorkingHour" },
+          ],
+        },
+        Target,
+      ],
     });
     res.status(200).json(response);
   } catch (error) {

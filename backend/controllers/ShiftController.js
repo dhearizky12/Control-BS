@@ -22,6 +22,10 @@ export const getShiftsById = async (req, res) => {
       where: {
         id: req.params.id,
       },
+      include: [
+        { model: WorkingHour, as: "startWorkingHour" },
+        { model: WorkingHour, as: "endWorkingHour" },
+      ],
     });
     res.status(200).json(response);
   } catch (error) {

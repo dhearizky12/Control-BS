@@ -1,13 +1,14 @@
 import Grammage from "../models/GrammageModel.js";
 import Shift from "../models/ShiftModel.js";
 import Target from "../models/TargetModel.js";
+import WorkingHour from "../models/WorkingHourModel.js";
 
 // TODO: throw respon error when get error (all api)
 export const getGrammages = async (req, res) => {
   try {
     const response = await Grammage.findAll({
       where: req.query,
-      include: [Shift, Target],
+      include: [Shift, Target, WorkingHour],
     });
     res.status(200).json(response);
   } catch (error) {
@@ -21,7 +22,7 @@ export const getGrammagesById = async (req, res) => {
       where: {
         id: req.params.id,
       },
-      include: [Shift, Target],
+      include: [Shift, Target, WorkingHour],
     });
     res.status(200).json(response);
   } catch (error) {

@@ -28,12 +28,14 @@ function Grammage() {
   const [averageSample, setAverageSample] = useState([0, 0, 0, 0, 0]);
   const [targetsData, setTargetsData] = useState([]);
   const [shiftsData, setShiftsData] = useState([]);
+  const [workingHoursData, setWorkingHourssData] = useState([]);
 
   const [selectedTarget, setSelectedTarget] = useState(null);
   const [openTarget, setOpenTarget] = useState(false);
   const [tempSelectedTargetId, setTempSelectedTargetId] = useState(null);
 
   const [shift, setShift] = useState("");
+  const [workingHour, setWorkingHour] = useState("");
   const [sample1, setSample1] = useState("");
   const [sample2, setSample2] = useState("");
   const [sample3, setSample3] = useState("");
@@ -119,6 +121,19 @@ function Grammage() {
       });
   }, []);
 
+  const handleGetWorkingHourData = useCallback(() => {
+    return fetch("/api/working-hours", { method: "GET" })
+      .then((response) => response.json())
+      .then((response) => {
+        setLoading(false);
+        setWorkingHourssData(response);
+      })
+      .catch((error) => {
+        setLoading(false);
+        console.error("API Error:", error);
+      });
+  }, []);
+
   useEffect(() => {
     setOpenLoading(true);
     handleGetTargetData();
@@ -129,7 +144,7 @@ function Grammage() {
   const handleOpen = async ({ target }) => {
     if (!open) {
       setOpenLoading(true);
-      await Promise.all([handleGetShiftData(), handleGetTargetData()]);
+      await Promise.all([handleGetShiftData(), handleGetWorkingHourData()]);
       setOpenLoading(false);
     }
 
@@ -138,6 +153,7 @@ function Grammage() {
       if (!data) return;
 
       setShift(data.shiftId.toString());
+      setWorkingHour(data.workingId.toString());
       setSample1(data.sample1);
       setSample2(data.sample2);
       setSample3(data.sample3);
@@ -147,6 +163,7 @@ function Grammage() {
 
     if (open) {
       setShift("");
+      setWorkingHour("");
       setSample1("");
       setSample2("");
       setSample3("");
@@ -179,7 +196,7 @@ function Grammage() {
   const handleOpenTarget = () => setOpenTarget(!openTarget);
 
   const handleSaveGrammage = () => {
-    if (!selectedTarget.id || !shift || !sample1 || !sample2 || !sample3 || !sample4) return;
+    if (!selectedTarget.id || !shift || !workingHour || !sample1 || !sample2 || !sample3 || !sample4) return;
 
     const url = "/api/grammages" + (updateData.id ? "/" + updateData.id : "");
     const method = updateData.id ? "PATCH" : "POST";
@@ -193,6 +210,7 @@ function Grammage() {
       body: JSON.stringify({
         targetId: selectedTarget.id,
         shiftId: shift,
+        workingHourId: workingHour,
         sample1,
         sample2,
         sample3,
@@ -276,7 +294,7 @@ function Grammage() {
         <Card className="max-h-full h-fit w-full overflow-hidden flex flex-col">
           <div className="grid grid-cols-[repeat(7,_1fr)_auto] bg-black border-b border-blue-gray-100 ">
             <Typography variant="small" color="white" className="font-bold leading-none text-md p-4">
-              Waktu Shift
+              Shift - Waktu
             </Typography>
             <Typography variant="small" color="white" className="font-bold leading-none text-md p-4">
               Sample 1
@@ -293,7 +311,7 @@ function Grammage() {
             <Typography
               variant="small"
               color="white"
-              className={"font-bold leading-none text-md p-4" + (!selectedTarget?.status? " mr-[17px]" : "")}
+              className={"font-bold leading-none text-md p-4" + (!selectedTarget?.status ? " mr-[17px]" : "")}
             >
               Average
             </Typography>
@@ -303,7 +321,7 @@ function Grammage() {
           </div>
           <div className="overflow-y-auto overflow-x-hidden gutter-stable">
             {grammagesData.length ? (
-              grammagesData.map(({ id, shift, sample1, sample2, sample3, sample4, average }, index) => {
+              grammagesData.map(({ id, shift, sample1, sample2, sample3, sample4, average, working_hour }, index) => {
                 return (
                   <div
                     key={index}
@@ -311,7 +329,11 @@ function Grammage() {
                   >
                     <div className="flex items-center">
                       <Typography color="blue-gray" className="font-bold">
-                        {shift}
+                        {shift} (
+                        {new Date(working_hour.time).getUTCHours().toString().padStart(2, "0") +
+                          ":" +
+                          new Date(working_hour.time).getUTCMinutes().toString().padStart(2, "0")}
+                        )
                       </Typography>
                     </div>
                     <div className="flex items-center">
@@ -408,6 +430,28 @@ function Grammage() {
                 })}
               </Select>
             </div>
+            <div className="mb-1">
+              <Select label="Jam Kerja" size="lg" placeholder="Pilih Jam Kerja" value={workingHour} onChange={setWorkingHour}>
+                {workingHoursData
+                  .filter((workingHour) => {
+                    let selectedShift = shiftsData.find((s) => s.id === Number(shift));
+                    if (selectedShift) {
+                      return workingHour.time >= selectedShift.startWorkingHour.time && workingHour.time <= selectedShift.endWorkingHour.time;
+                    }
+                    return false;
+                  })
+                  .map((workingHour, index) => {
+                    return (
+                      <Option key={index} value={workingHour.id.toString()}>
+                        {new Date(workingHour.time).getUTCHours().toString().padStart(2, "0") +
+                          ":" +
+                          new Date(workingHour.time).getUTCMinutes().toString().padStart(2, "0")}
+                      </Option>
+                    );
+                  })}
+              </Select>
+            </div>
+            <div></div>
             <div className="mb-1">
               <Input label="Sample 1" size="lg" placeholder="example: 70" value={sample1} onChange={onSample1Change} />
             </div>

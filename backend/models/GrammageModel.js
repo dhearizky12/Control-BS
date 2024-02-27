@@ -2,6 +2,7 @@ import { Sequelize } from "sequelize";
 import db from "../config/Database.js";
 import Target from "./TargetModel.js";
 import Shift from "./ShiftModel.js";
+import WorkingHour from "./WorkingHourModel.js";
 
 const { DataTypes } = Sequelize;
 
@@ -41,6 +42,9 @@ Grammage.belongsTo(Target);
 
 Shift.hasMany(Grammage);
 Grammage.belongsTo(Shift);
+
+WorkingHour.hasMany(Grammage);
+Grammage.belongsTo(WorkingHour);
 
 Grammage.sync();
 
