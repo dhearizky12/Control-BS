@@ -11,9 +11,11 @@ function Dashboard() {
   const [targetsData, setTargetsData] = useState([]);
 
   const [totalProduction, setTotalProduction] = useState(0);
+  const [totalMix, setTotalMix] = useState(0);
+  const [totalAdditionBS, setTotalAdditionBS] = useState(0);
+  const [totalWaste, setTotalWaste] = useState(0);
   const [shortageProduction, setShortageProduction] = useState(0);
   const [grammage, setGrammage] = useState(0);
-  const [lastProduction, setLastProduction] = useState({});
 
   const [selectedTarget, setSelectedTarget] = useState(null);
   const [openTarget, setOpenTarget] = useState(false);
@@ -39,17 +41,27 @@ function Dashboard() {
     async (selectedTarget) => {
       const productions = await handleGetProductionData(selectedTarget);
       let totalProduction = 0;
+      let totalMix = 0;
+      let totalAdditionBS = 0;
+      let totalWaste = 0;
       productions.forEach((production) => {
         totalProduction += production.result;
+        totalMix += production.mixResult;
+        totalAdditionBS += production.additionBS;
+        totalWaste += production.waste;
       });
 
+      totalMix += Math.floor(totalAdditionBS / 120);
+
       setTotalProduction(totalProduction);
-      setLastProduction(productions[0])
+      setTotalMix(totalMix);
+      setTotalAdditionBS(totalAdditionBS);
+      setTotalWaste(totalWaste);
       setShortageProduction(selectedTarget.target - totalProduction);
 
       const grammages = await handleGetGrammageData(selectedTarget);
       const averages = grammages.map((grammage) => grammage.average);
-      const grammage = averages.length? (averages.reduce((a, b) => a + b, 0) / averages.length).toFixed(3) : 0
+      const grammage = averages.length ? (averages.reduce((a, b) => a + b, 0) / averages.length).toFixed(2) : 0;
       setGrammage(grammage);
     },
     [handleGetProductionData, handleGetGrammageData]
@@ -95,9 +107,9 @@ function Dashboard() {
     setTempSelectedTargetId(selected.id);
     handleOpenTarget();
 
-    setOpenLoading(true)
-    await processData(selected)
-    setOpenLoading(false)
+    setOpenLoading(true);
+    await processData(selected);
+    setOpenLoading(false);
   };
 
   return (
@@ -151,10 +163,21 @@ function Dashboard() {
           <Card color="gray" variant="gradient" shadow={false} className="border flex-1">
             <CardBody className="py-4 h-full flex flex-col justify-between">
               <Typography variant="h6" className="font-bold">
-                Total Produksi
+                Hasil Produksi
               </Typography>
               <div>
                 <Typography className="font-bold text-4xl inline-block mr-2">{totalProduction}</Typography>
+                <Typography className="font-bold text-lg inline-block">Box</Typography>
+              </div>
+            </CardBody>
+          </Card>
+          <Card color="gray" variant="gradient" shadow={false} className="border flex-1">
+            <CardBody className="py-4 h-full flex flex-col justify-between">
+              <Typography variant="h6" className="font-bold">
+                Kurang Produksi
+              </Typography>
+              <div>
+                <Typography className="font-bold text-4xl inline-block mr-2">{shortageProduction}</Typography>
                 <Typography className="font-bold text-lg inline-block">Box</Typography>
               </div>
             </CardBody>
@@ -166,49 +189,25 @@ function Dashboard() {
               </Typography>
               <div>
                 <Typography className="font-bold text-4xl inline-block mr-2">{grammage}</Typography>
-                <Typography className="font-bold text-lg inline-block">Kg</Typography>
-              </div>
-            </CardBody>
-          </Card>
-          <Card color="gray" variant="gradient" shadow={false} className="border flex-1">
-            <CardBody className="py-4 h-full flex flex-col justify-between">
-              <Typography variant="h6" className="font-bold">
-                Produksi {lastProduction.shift?.name}
-              </Typography>
-              <div>
-                <Typography className="font-bold text-4xl inline-block mr-2">{lastProduction.result}</Typography>
-                <Typography className="font-bold text-lg inline-block">Box</Typography>
+                <Typography className="font-bold text-lg inline-block">Gram</Typography>
               </div>
             </CardBody>
           </Card>
         </div>
       </div>
-      <div className="grid grid-cols-6 gap-4">
-        <Card shadow={false} className="border flex-1">
-          <CardBody className="h-full text-center">
-            <Typography variant="h6" className="font-bold">
-              Kurang Produksi
-            </Typography>
-            <div>
-              <Typography color="blue-gray" className="font-bold mr-2 mt-3 text-5xl">
-                {shortageProduction}
-              </Typography>
-              <Typography color="blue-gray" className="font-bold inline-block mt-3 text-lg">
-                Box
-              </Typography>
-            </div>
-          </CardBody>
-        </Card>
+      <div className="grid grid-cols-5 gap-4">
         <Card shadow={false} className="border flex-1">
           <CardBody className="h-full text-center">
             <Typography variant="h6" className="font-bold">
               Hasil Adukan
             </Typography>
             <div>
-              <Typography color="blue-gray" className="font-bold mr-2 mt-3 text-5xl">
-                -
+              <Typography color="blue-gray" className="font-bold mt-3 text-6xl">
+                {totalMix}
               </Typography>
-              {/* <Typography color="blue-gray" className="font-bold inline-block mt-3 text-lg"></Typography> */}
+              <Typography color="blue-gray" className="font-bold inline-block mt-3 text-lg">
+                Kali
+              </Typography>
             </div>
           </CardBody>
         </Card>
@@ -218,10 +217,12 @@ function Dashboard() {
               Kurang Adukan
             </Typography>
             <div>
-              <Typography color="blue-gray" className="font-bold mr-2 mt-3 text-5xl">
+              <Typography color="blue-gray" className="font-bold mt-3 text-6xl">
                 -
               </Typography>
-              {/* <Typography color="blue-gray" className="font-bold inline-block mt-3 text-lg"></Typography> */}
+              <Typography color="blue-gray" className="font-bold inline-block mt-3 text-lg">
+                Kali
+              </Typography>
             </div>
           </CardBody>
         </Card>
@@ -231,10 +232,12 @@ function Dashboard() {
               Penambahan BS
             </Typography>
             <div>
-              <Typography color="blue-gray" className="font-bold mr-2 mt-3 text-5xl">
-                -
+              <Typography color="blue-gray" className="font-bold mt-3 text-6xl">
+                {totalAdditionBS}
               </Typography>
-              {/* <Typography color="blue-gray" className="font-bold inline-block mt-3 text-lg"></Typography> */}
+              <Typography color="blue-gray" className="font-bold inline-block mt-3 text-lg">
+                Kg
+              </Typography>
             </div>
           </CardBody>
         </Card>
@@ -244,10 +247,12 @@ function Dashboard() {
               Stagnasi Adukan
             </Typography>
             <div>
-              <Typography color="blue-gray" className="font-bold mr-2 mt-3 text-5xl">
+              <Typography color="blue-gray" className="font-bold mt-3 text-6xl">
                 -
               </Typography>
-              {/* <Typography color="blue-gray" className="font-bold inline-block mt-3 text-lg"></Typography> */}
+              <Typography color="blue-gray" className="font-bold inline-block mt-3 text-lg">
+                Kg
+              </Typography>
             </div>
           </CardBody>
         </Card>
@@ -257,8 +262,8 @@ function Dashboard() {
               Waste
             </Typography>
             <div>
-              <Typography color="blue-gray" className="font-bold mr-2 mt-3 text-5xl">
-                {lastProduction.waste}
+              <Typography color="blue-gray" className="font-bold mt-3 text-6xl">
+                {totalWaste}
               </Typography>
               <Typography color="blue-gray" className="font-bold inline-block mt-3 text-lg">
                 Kg

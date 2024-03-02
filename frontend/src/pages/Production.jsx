@@ -51,6 +51,10 @@ function Production() {
   const onGrammageChange = ({ target }) => setGrammage(target.value);
   const onResultChange = ({ target }) => setResult(target.value);
   const onWasteChange = ({ target }) => setWaste(target.value);
+  const onShiftChange = async (value) => {
+    setShift(value);
+    await handleGetAverageGrammageData(value);
+  };
 
   const onTargetChange = ({ target }) => setTempSelectedTargetId(target.value);
 
@@ -126,6 +130,29 @@ function Production() {
       });
   }, []);
 
+  const handleGetAverageGrammageData = useCallback(
+    (shiftId) => {
+      return fetch("/api/grammages?targetId=" + selectedTarget.id, { method: "GET" })
+        .then((response) => response.json())
+        .then((responses) => {
+          setLoading(false);
+          let average = 0;
+          responses.forEach((grammage) => {
+            average += grammage.average / responses.length;
+          });
+
+          setGrammage(average.toFixed(2));
+
+          return responses;
+        })
+        .catch((error) => {
+          setLoading(false);
+          console.error("API Error:", error);
+        });
+    },
+    [selectedTarget]
+  );
+
   useEffect(() => {
     setOpenLoading(true);
     handleGetTargetData();
@@ -148,7 +175,10 @@ function Production() {
       setShift(data.shiftId.toString());
       setMixResult(data.mixResult);
       setAdditionBS(data.additionBS);
+
       setGrammage(data.grammage);
+      handleGetAverageGrammageData(data.shiftId.toString());
+
       setResult(data.result);
       setWaste(data.waste);
       setUpdateData(data);
@@ -190,7 +220,9 @@ function Production() {
   const handleOpenTarget = () => setOpenTarget(!openTarget);
 
   const handleSaveProduction = () => {
-    if (!selectedTarget.id || !group || !shift || !mixResult || !additionBS || !grammage || !result || !waste) return;
+    if (!selectedTarget.id || !group || !shift || mixResult < 0 || additionBS < 0 || grammage < 0 || result < 0 || waste < 0) return;
+
+    console.log(selectedTarget, group, shift, mixResult, additionBS, grammage, result, waste);
 
     const url = "/api/productions" + (updateData.id ? "/" + updateData.id : "");
     const method = updateData.id ? "PATCH" : "POST";
@@ -280,7 +312,7 @@ function Production() {
           <div>
             <Button onClick={handleOpen} className="flex items-center gap-2">
               <PlusIcon className="h-5 w-5" />
-              Tambah Produksi
+              Hasil Produksi
             </Button>
           </div>
         )}
@@ -298,16 +330,16 @@ function Production() {
               Shift
             </Typography>
             <Typography variant="small" color="white" className="font-bold leading-none text-md p-4">
-              Hasil Adukan
-            </Typography>
-            <Typography variant="small" color="white" className="font-bold leading-none text-md p-4">
-              Tambahan BS
-            </Typography>
-            <Typography variant="small" color="white" className="font-bold leading-none text-md p-4">
               Gramasi
             </Typography>
             <Typography variant="small" color="white" className="font-bold leading-none text-md p-4">
+              Hasil Adukan
+            </Typography>
+            <Typography variant="small" color="white" className="font-bold leading-none text-md p-4">
               Hasil Produksi
+            </Typography>
+            <Typography variant="small" color="white" className="font-bold leading-none text-md p-4">
+              Tambahan BS
             </Typography>
             <Typography
               variant="small"
@@ -317,7 +349,7 @@ function Production() {
               Waste
             </Typography>
             {!!selectedTarget?.status && (
-              <Typography variant="small" color="white" className="font-bold leading-none text-md p-4 w-[217.89px] mr-[17px]">
+              <Typography variant="small" color="white" className="font-bold leading-none text-md p-4 w-[116.28px] mr-[17px]">
                 Aksi
               </Typography>
             )}
@@ -347,17 +379,12 @@ function Production() {
                     </div>
                     <div className="flex items-center">
                       <Typography variant="small" color="blue-gray" className="font-normal">
-                        {mixResult} Kg
+                        {grammage} Gram
                       </Typography>
                     </div>
                     <div className="flex items-center">
                       <Typography variant="small" color="blue-gray" className="font-normal">
-                        {additionBS} Kg
-                      </Typography>
-                    </div>
-                    <div className="flex items-center">
-                      <Typography variant="small" color="blue-gray" className="font-normal">
-                        {grammage} Kg
+                        {mixResult}x
                       </Typography>
                     </div>
                     <div className="flex items-center">
@@ -367,14 +394,16 @@ function Production() {
                     </div>
                     <div className="flex items-center">
                       <Typography variant="small" color="blue-gray" className="font-normal">
+                        {additionBS} Kg
+                      </Typography>
+                    </div>
+                    <div className="flex items-center">
+                      <Typography variant="small" color="blue-gray" className="font-normal">
                         {waste} Kg
                       </Typography>
                     </div>
                     {!!selectedTarget?.status && (
-                      <div className="flex gap-3 w-[217.89px] mr-[17px]">
-                        <Button variant="outlined" color="red" data-id={id} onClick={handleOpenDelete}>
-                          Hapus
-                        </Button>
+                      <div className="flex gap-3 w-[116.28px] mr-[17px]">
                         <Button variant="outlined" data-id={id} onClick={handleOpen}>
                           Ubah
                         </Button>
@@ -399,14 +428,22 @@ function Production() {
       </div>
 
       <Dialog open={open} handler={handleOpen}>
-        <DialogHeader>{updateData.id ? "Ubah" : "Tambah"} Produksi</DialogHeader>
+        <DialogHeader>{updateData.id ? "Ubah" : ""} Hasil Produksi</DialogHeader>
         <DialogBody>
           <div className="grid grid-cols-2 gap-4">
             <div className="mb-1 pointer-events-none">
               <Input label="Target" size="lg" value={selectedTarget?.mid} readOnly className="!bg-gray-200" />
             </div>
-            <div className="mb-1">
-              <Select label="Group" size="lg" placeholder="Pilih Group" value={group} onChange={setGroup}>
+            <div className={"mb-1" + (!!updateData.id && " pointer-events-none")}>
+              <Select
+                label="Group"
+                size="lg"
+                placeholder="Pilih Group"
+                readOnly={!!updateData.id}
+                value={group}
+                onChange={setGroup}
+                className={!!updateData.id && "!bg-gray-200"}
+              >
                 {groupsData.map((group, index) => {
                   return (
                     <Option key={index} value={group.id.toString()}>
@@ -416,46 +453,58 @@ function Production() {
                 })}
               </Select>
             </div>
-            <div className="mb-1">
-              <Select label="Shift" size="lg" placeholder="Pilih Shift" value={shift} onChange={setShift}>
+            <div className={"mb-1" + (!!updateData.id && " pointer-events-none")}>
+              <Select
+                label="Shift"
+                size="lg"
+                placeholder="Pilih Shift"
+                readOnly={!!updateData.id}
+                value={shift}
+                onChange={onShiftChange}
+                className={!!updateData.id && "!bg-gray-200"}
+              >
                 {shiftsData.map((shift, index) => {
                   return (
                     <Option key={index} value={shift.id.toString()}>
-                      {shift.name} (
-                      {new Date(shift.startWorkingHour.time).getUTCHours().toString().padStart(2, "0") +
-                        ":" +
-                        new Date(shift.startWorkingHour.time).getUTCMinutes().toString().padStart(2, "0")}
-                      &#10240;-&#10240;
-                      {new Date(shift.endWorkingHour.time).getUTCHours().toString().padStart(2, "0") +
-                        ":" +
-                        new Date(shift.endWorkingHour.time).getUTCMinutes().toString().padStart(2, "0")}
-                      )
+                      {shift.name}
                     </Option>
                   );
                 })}
               </Select>
             </div>
             <div className="mb-1">
-              <Input label="Hasil Adukan" size="lg" placeholder="example: 70" value={mixResult} onChange={onMixResultChange} />
-            </div>
-            <div className="mb-1">
-              <Input label="Penambahan BS" size="lg" placeholder="example: 70" value={additionBS} onChange={onAdditionBSChange} />
-            </div>
-            <div className="mb-1">
-              <Input label="Gramasi" size="lg" placeholder="example: 70" value={grammage} onChange={onGrammageChange} />
-            </div>
-            <div className="mb-1">
-              <Input label="Hasil Produksi" size="lg" placeholder="example: 70" value={result} onChange={onResultChange} />
-            </div>
-            <div className="mb-1">
-              <Input label="Waste" size="lg" placeholder="example: 70" value={waste} onChange={onWasteChange} />
+              <Input label="Gramasi" size="lg" value={grammage} readOnly className="!bg-gray-200" />
             </div>
           </div>
+          {!!updateData.id && (
+            <div>
+              <hr className="mb-6 mt-6" />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="mb-1">
+                  <Input type="number" label="Hasil Adukan" size="lg" placeholder="example: 70" value={mixResult} onChange={onMixResultChange} />
+                </div>
+                <div className="mb-1">
+                  <Input type="number" label="Penambahan BS" size="lg" placeholder="example: 70" value={additionBS} onChange={onAdditionBSChange} />
+                </div>
+                <div className="mb-1">
+                  <Input type="number" label="Hasil Produksi" size="lg" placeholder="example: 70" value={result} onChange={onResultChange} />
+                </div>
+                <div className="mb-1">
+                  <Input type="number" label="Waste" size="lg" placeholder="example: 70" value={waste} onChange={onWasteChange} />
+                </div>
+              </div>
+            </div>
+          )}
         </DialogBody>
         <DialogFooter>
-          <Button variant="text" onClick={handleOpen} className="mr-3">
+          <Button variant="outlined" onClick={handleOpen} className="mr-3">
             <span>Batal</span>
           </Button>
+          {!!updateData.id && (
+            <Button variant="outlined" color="red" data-id={updateData.id} onClick={handleOpenDelete} className="mr-3">
+              Hapus
+            </Button>
+          )}
           <Button color="green" loading={saveLoading} onClick={handleSaveProduction}>
             <span>Simpan</span>
           </Button>

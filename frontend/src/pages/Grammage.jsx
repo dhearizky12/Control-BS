@@ -25,10 +25,10 @@ function Grammage() {
   const [openLoading, setOpenLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [grammagesData, setGrammagesData] = useState([]);
-  const [averageSample, setAverageSample] = useState([0, 0, 0, 0, 0]);
+  const [average, setAverage] = useState(0);
   const [targetsData, setTargetsData] = useState([]);
   const [shiftsData, setShiftsData] = useState([]);
-  const [workingHoursData, setWorkingHourssData] = useState([]);
+  const [workingHoursData, setWorkingHoursData] = useState([]);
 
   const [selectedTarget, setSelectedTarget] = useState(null);
   const [openTarget, setOpenTarget] = useState(false);
@@ -46,17 +46,7 @@ function Grammage() {
   const [saveLoading, setSaveLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
-  const onShiftChange = (value, shifts, workingHours) => {
-    if (!shifts) shifts = shiftsData;
-    if (!workingHours) workingHours = workingHoursData;
-    let selectedShift = shifts.find((s) => s.id === Number(value));
-    let selectableWorkingHours = workingHours.map((workingHour) => {
-      workingHour.show =
-        selectedShift && workingHour.time >= selectedShift.startWorkingHour.time && workingHour.time <= selectedShift.endWorkingHour.time;
-      return workingHour;
-    });
-
-    setWorkingHourssData(selectableWorkingHours);
+  const onShiftChange = (value) => {
     setWorkingHour("");
     setShift(value);
   };
@@ -75,24 +65,19 @@ function Grammage() {
       .then((responses) => responses.json())
       .then((responses) => {
         setLoading(false);
-        let averageSample = [];
-
+        let average = 0;
         setGrammagesData(
-          responses.map((grammage) => {
-            grammage.shift = grammage.shift.name;
+          responses
+            .map((grammage) => {
+              grammage.shift = grammage.shift.name;
+              average += grammage.average / responses.length;
 
-            // calculate sample average
-            averageSample[0] = averageSample[0] ? (averageSample[0] + grammage.sample1) / 2 : grammage.sample1;
-            averageSample[1] = averageSample[1] ? (averageSample[1] + grammage.sample2) / 2 : grammage.sample2;
-            averageSample[2] = averageSample[2] ? (averageSample[2] + grammage.sample3) / 2 : grammage.sample3;
-            averageSample[3] = averageSample[3] ? (averageSample[3] + grammage.sample4) / 2 : grammage.sample4;
-            averageSample[4] = averageSample[4] ? (averageSample[4] + grammage.average) / 2 : grammage.average;
-
-            return grammage;
-          })
+              return grammage;
+            })
+            .sort((a, b) => a.workingHourId - b.workingHourId)
         );
 
-        setAverageSample(averageSample);
+        setAverage(average);
       })
       .catch((error) => {
         setLoading(false);
@@ -141,7 +126,7 @@ function Grammage() {
       .then((response) => response.json())
       .then((response) => {
         setLoading(false);
-        setWorkingHourssData(response);
+        setWorkingHoursData(response.sort((a, b) => new Date(a.time) - new Date(b.time)));
 
         return response;
       })
@@ -159,11 +144,9 @@ function Grammage() {
   }, [handleGetTargetData]);
 
   const handleOpen = async ({ target }) => {
-    let result = [];
-
     if (!open) {
       setOpenLoading(true);
-      result = await Promise.all([handleGetShiftData(), handleGetWorkingHourData()]);
+      await Promise.all([handleGetShiftData(), handleGetWorkingHourData()]);
       setOpenLoading(false);
     }
 
@@ -171,7 +154,7 @@ function Grammage() {
       var data = grammagesData.find((value) => value.id === Number(target.dataset.id));
       if (!data) return;
 
-      onShiftChange(data.shiftId.toString(), result[0], result[1]);
+      onShiftChange(data.shiftId.toString());
       setWorkingHour(data.workingHourId.toString());
       setSample1(data.sample1);
       setSample2(data.sample2);
@@ -313,7 +296,7 @@ function Grammage() {
         <Card className="max-h-full h-fit w-full overflow-hidden flex flex-col">
           <div className="grid grid-cols-[repeat(7,_1fr)_auto] bg-black border-b border-blue-gray-100 ">
             <Typography variant="small" color="white" className="font-bold leading-none text-md p-4">
-              Shift - Waktu
+              Shift - Sampling
             </Typography>
             <Typography variant="small" color="white" className="font-bold leading-none text-md p-4">
               Sample 1
@@ -348,36 +331,34 @@ function Grammage() {
                   >
                     <div className="flex items-center">
                       <Typography color="blue-gray" className="font-bold">
-                        {shift} (
-                        {new Date(working_hour.time).getUTCHours().toString().padStart(2, "0") +
+                        {shift + " - "  + new Date(working_hour.time).getUTCHours().toString().padStart(2, "0") +
                           ":" +
                           new Date(working_hour.time).getUTCMinutes().toString().padStart(2, "0")}
-                        )
                       </Typography>
                     </div>
                     <div className="flex items-center">
                       <Typography color="blue-gray" className="font-normal">
-                        {sample1} Kg
+                        {sample1} Gram
                       </Typography>
                     </div>
                     <div className="flex items-center">
                       <Typography color="blue-gray" className="font-normal">
-                        {sample2} Kg
+                        {sample2} Gram
                       </Typography>
                     </div>
                     <div className="flex items-center">
                       <Typography color="blue-gray" className="font-normal">
-                        {sample3} Kg
+                        {sample3} Gram
                       </Typography>
                     </div>
                     <div className="flex items-center">
                       <Typography color="blue-gray" className="font-normal">
-                        {sample4} Kg
+                        {sample4} Gram
                       </Typography>
                     </div>
                     <div className="p-4 border-b !border-white bg-blue-gray-50 flex items-center">
                       <Typography color="blue-gray" className="font-bold">
-                        {(average).toFixed(3)} Kg
+                        {average.toFixed(3)} Gram
                       </Typography>
                     </div>
                     <div className="flex gap-3 w-[217.89px] mr-[17px]">
@@ -410,13 +391,15 @@ function Grammage() {
                   Average
                 </Typography>
               </div>
-              {averageSample.map((average, index) => (
-                <div key={index + "-foot"} className={"border-blue-gray-100 p-4" + (index === 4 ? " bg-green-500/60" : "")}>
-                  <Typography color="white" className="font-bold leading-none text-md">
-                    {(average).toFixed(3)} Kg
-                  </Typography>
-                </div>
-              ))}
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div className="border-blue-gray-100 p-4 bg-green-500/60">
+                <Typography color="white" className="font-bold leading-none text-md">
+                  {average.toFixed(2)} Gram
+                </Typography>
+              </div>
               <div className="p-4 w-[217.89px] mr-[17px]"></div>
             </div>
           )}
@@ -435,25 +418,17 @@ function Grammage() {
                 {shiftsData.map((shift, index) => {
                   return (
                     <Option key={index} value={shift.id.toString()}>
-                      {shift.name} (
-                      {new Date(shift.startWorkingHour.time).getUTCHours().toString().padStart(2, "0") +
-                        ":" +
-                        new Date(shift.startWorkingHour.time).getUTCMinutes().toString().padStart(2, "0")}
-                      &#10240;-&#10240;
-                      {new Date(shift.endWorkingHour.time).getUTCHours().toString().padStart(2, "0") +
-                        ":" +
-                        new Date(shift.endWorkingHour.time).getUTCMinutes().toString().padStart(2, "0")}
-                      )
+                      {shift.name}
                     </Option>
                   );
                 })}
               </Select>
             </div>
-            <div className="mb-1">
-              <Select label="Jam Kerja" size="lg" placeholder="Pilih Jam Kerja" value={workingHour} onChange={setWorkingHour}>
-                {workingHoursData.map((workingHour, index) => {
+            <div className="mb-1 [&_ul]:max-h-[200px]">
+              <Select label="Jam Sampling" size="lg" placeholder="Pilih Jam Sampling" value={workingHour} onChange={setWorkingHour}>
+                {workingHoursData.map((workingHour) => {
                   return (
-                    <Option key={workingHour.id} value={workingHour.id.toString()} className={workingHour.show ? "show" : "hidden"}>
+                    <Option key={workingHour.id} value={workingHour.id.toString()}>
                       {new Date(workingHour.time).getUTCHours().toString().padStart(2, "0") +
                         ":" +
                         new Date(workingHour.time).getUTCMinutes().toString().padStart(2, "0")}

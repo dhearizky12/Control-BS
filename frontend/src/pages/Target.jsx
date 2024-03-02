@@ -22,7 +22,7 @@ import { PlusIcon, ChevronLeftIcon, ChevronRightIcon, CheckIcon, PencilSquareIco
 import { format } from "date-fns";
 
 function Target() {
-  const TABLE_HEAD = useRef(["Tanggal", "Nama Produk", "Target Produksi", "MID", "Status"]);
+  const TABLE_HEAD = useRef(["MID", "Tanggal", "Nama Produk", "Target Produksi"]);
   const TABLE_STATUS = useRef(["Selesai", "Aktif"]);
   const TABLE_STATUS_COLOR = useRef(["blue", "green"]);
 
@@ -46,6 +46,12 @@ function Target() {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [doneLoading, setDoneLoading] = useState(false);
 
+  const [showDate, setShowDate] = useState(false);
+
+  const onSelectDate = (value) => {
+    setDate(value);
+    setShowDate(false);
+  };
   const onMidChange = ({ target }) => setMid(target.value);
   const onTargetChange = ({ target }) => setTarget(target.value);
 
@@ -206,7 +212,7 @@ function Target() {
       .then((response) => response.json())
       .then((response) => {
         setDoneLoading(false);
-        handleOpenDone()
+        handleOpenDone();
         handleGetTargetData();
       })
       .catch((error) => {
@@ -227,7 +233,7 @@ function Target() {
               <CheckIcon className="h-5 w-5" />
               Target Selesai
             </Button>
-            <Button data-id={activeTarget.id}  onClick={handleOpen} variant="outlined" className="flex items-center gap-2">
+            <Button data-id={activeTarget.id} onClick={handleOpen} variant="outlined" className="flex items-center gap-2">
               <PencilSquareIcon className="h-5 w-5" />
               Ubah Target
             </Button>
@@ -287,10 +293,10 @@ function Target() {
       )}
 
       <div className="mt-12">
-        <div className="font-bold text-xl mb-3">History Target</div>
+        <div className="font-bold text-xl mb-3">Histori Target</div>
         <div className="flex-1 w-full overflow-hidden pb-4">
           <Card className="max-h-full h-fit w-full overflow-hidden flex flex-col">
-            <div className="grid grid-cols-5 bg-black border-b border-blue-gray-100 ">
+            <div className="grid grid-cols-4 bg-black border-b border-blue-gray-100 ">
               {TABLE_HEAD.current.map((head) => (
                 <div key={head} className="p-4">
                   <Typography color="white" className="font-bold leading-none text-md">
@@ -303,9 +309,14 @@ function Target() {
               {targetsData.length ? (
                 targetsData.map(({ date, product, target, mid, status }, index) => {
                   return (
-                    <div key={index} className="grid grid-cols-5 [&>div]:p-4 [&>div]:border-b [&>div]:border-blue-gray-50 -mr-[17px]">
+                    <div key={index} className="grid grid-cols-4 [&>div]:p-4 [&>div]:border-b [&>div]:border-blue-gray-50 -mr-[17px]">
                       <div>
                         <Typography color="blue-gray" className="font-bold">
+                          {mid}
+                        </Typography>
+                      </div>
+                      <div>
+                        <Typography color="blue-gray" className="font-normal">
                           {format(date, "dd MMMM yyyy")}
                         </Typography>
                       </div>
@@ -314,18 +325,10 @@ function Target() {
                           {product}
                         </Typography>
                       </div>
-                      <div>
+                      <div >
                         <Typography color="blue-gray" className="font-normal">
                           {target} Box
                         </Typography>
-                      </div>
-                      <div>
-                        <Typography color="blue-gray" className="font-normal">
-                          {mid}
-                        </Typography>
-                      </div>
-                      <div>
-                        <Chip value={TABLE_STATUS.current[status]} color={TABLE_STATUS_COLOR.current[status]} className="text-center" />
                       </div>
                     </div>
                   );
@@ -347,22 +350,28 @@ function Target() {
       </div>
 
       <Dialog open={open} handler={handleOpen}>
-        <DialogHeader>{updateData?.id? 'Ubah' : 'Tambah'} Target</DialogHeader>
+        <DialogHeader>{updateData?.id ? "Ubah" : "Tambah"} Target</DialogHeader>
         <DialogBody>
           <div className="grid grid-cols-2 gap-4">
             <div className="mb-1">
               <Input label="MID" size="lg" placeholder="example: OP1234" value={mid} onChange={onMidChange} />
             </div>
             <div className="mb-1 [&>div]:h-full">
-              <Popover placement="bottom">
+              <Popover
+                open={showDate}
+                animate={{
+                  mount: { scale: 1, y: 0 },
+                  unmount: { scale: 0, y: 25 },
+                }}
+              >
                 <PopoverHandler>
-                  <Input label="Tanggal" onChange={() => null} value={date ? format(date, "dd MMMM yyyy") : ""} />
+                  <Input label="Tanggal" onFocus={() => setShowDate(true)} value={date ? format(date, "dd MMMM yyyy") : ""} />
                 </PopoverHandler>
                 <PopoverContent className="z-[9999]">
                   <DayPicker
                     mode="single"
                     selected={date}
-                    onSelect={setDate}
+                    onSelect={onSelectDate}
                     showOutsideDays
                     className="border-0"
                     classNames={{

@@ -16,11 +16,11 @@ const Target = db.define(
       allowNull: false,
     },
     target: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.FLOAT,
       allowNull: false,
     },
     status: {
-      type: DataTypes.INTEGER, // 1 is active, 0 is done/closed
+      type: DataTypes.FLOAT, // 1 is active, 0 is done/closed
       defaultValue: 1,
     },
   },

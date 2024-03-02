@@ -1,9 +1,8 @@
 import dotenv from "dotenv";
-import path from "path";
 
 const envVars = process.env;
-const envPath = [".env.development.local"];
-if (envVars.NODE_ENV == "production") path = [".env"];
+let envPath = [".env.development.local"];
+if (envVars.NODE_ENV == "production") envPath = [".env"];
 
 dotenv.config({ path: envPath });
 
