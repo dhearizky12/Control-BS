@@ -29,8 +29,8 @@ function Main() {
   }, [pathname]);
 
   return (
-    <div className="flex h-full">
-      <Card className="h-full w-full max-w-[18rem] p-4 rounded-none">
+    <div className="">
+      <Card className="absolute z-50 -translate-x-[100%] xl:translate-x-0 transition-transform h-full w-full max-w-[18rem] p-4 rounded-none">
         <div className="px-4 pt-4 pb-2">
           <Typography color="blue-gray" className="text-3xl font-extrabold leading-[1]">
             CONTROL BS
@@ -131,7 +131,7 @@ function Main() {
           </Accordion>
         </List>
       </Card>
-      <div className="flex-1 bg-gray-50">
+      <div className="xl:pl-[288px] bg-gray-50 h-screen">
         <Outlet />
       </div>
     </div>

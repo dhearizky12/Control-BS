@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Card, CardBody, Typography, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Radio, Spinner } from "@material-tailwind/react";
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import { ChevronDownIcon, Bars4Icon } from "@heroicons/react/24/outline";
 import { format } from "date-fns";
 
 function Dashboard() {
@@ -76,20 +76,20 @@ function Dashboard() {
     let grammage = grammageInput / 1000;
     let totalProduction = totalProductionInput * 72 * grammage;
     let materialRequirements = targetInput * 72 * grammage;
-    let materialTotal = (materialRequirements - totalAdditionBSInput) - (totalProduction + totalWasteInput);
+    let materialTotal = materialRequirements - totalAdditionBSInput - (totalProduction + totalWasteInput);
     let insufficientMix = materialTotal / 210;
 
     setInsufficientMix(insufficientMix.toFixed(2));
-  }
+  };
 
   const processStagnationMix = (totalProductionInput, grammageInput, totalMixInput, totalAdditionBSInput, totalWasteInput) => {
     let grammage = grammageInput / 1000;
     let totalProduction = totalProductionInput * 72 * grammage;
     let totalMix = totalMixInput * 120;
 
-    let stagnationMix = (totalMix - totalAdditionBSInput) - (totalProduction + totalWasteInput);
-    setStagnationMix(stagnationMix.toFixed(2))
-  }
+    let stagnationMix = totalMix - totalAdditionBSInput - (totalProduction + totalWasteInput);
+    setStagnationMix(stagnationMix.toFixed(2));
+  };
 
   const handleGetTargetData = useCallback(() => {
     return fetch("/api/targets", { method: "GET" })
@@ -137,8 +137,11 @@ function Dashboard() {
   };
 
   return (
-    <div className="h-full py-4 px-8 flex flex-col gap-4">
+    <div className="h-full py-4 px-8 flex flex-col gap-4 overflow-auto">
       <div className="flex items-end gap-2">
+        <div>
+          <Bars4Icon className="w-10 h-10" />
+        </div>
         <div className="cursor-pointer pr-4" onClick={handleOpenTarget}>
           <Typography className="text-gray-700">Target</Typography>
           {selectedTarget ? (
@@ -164,7 +167,7 @@ function Dashboard() {
         </div>
       </div>
       <div className="w-full">
-        <div className="h-full w-full flex gap-4">
+        <div className="h-full w-full grid grid-cols-1 xl:grid-cols-5 gap-4">
           <Card color="gray" variant="gradient" shadow={false} className="border flex-1">
             <CardBody className="py-4 h-full flex flex-col justify-between">
               <Typography variant="h6" className="font-bold">
@@ -219,7 +222,7 @@ function Dashboard() {
           </Card>
         </div>
       </div>
-      <div className="grid grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 xl:grid-cols-5 gap-4">
         <Card shadow={false} className="border flex-1">
           <CardBody className="h-full text-center">
             <Typography variant="h6" className="font-bold">
