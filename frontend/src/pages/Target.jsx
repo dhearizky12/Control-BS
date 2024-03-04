@@ -15,7 +15,6 @@ import {
   PopoverContent,
   Select,
   Option,
-  Chip,
 } from "@material-tailwind/react";
 import { DayPicker } from "react-day-picker";
 import { PlusIcon, ChevronLeftIcon, ChevronRightIcon, CheckIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
@@ -23,8 +22,6 @@ import { format } from "date-fns";
 
 function Target() {
   const TABLE_HEAD = useRef(["MID", "Tanggal", "Nama Produk", "Target Produksi"]);
-  const TABLE_STATUS = useRef(["Selesai", "Aktif"]);
-  const TABLE_STATUS_COLOR = useRef(["blue", "green"]);
 
   const [open, setOpen] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
@@ -40,6 +37,8 @@ function Target() {
   const [product, setProduct] = useState("");
   const [target, setTarget] = useState(0);
 
+  const [nik, setNik] = useState("");
+
   const [updateData, setUpdateData] = useState({});
   const [deleteData, setDeleteData] = useState({});
   const [saveLoading, setSaveLoading] = useState(false);
@@ -54,6 +53,8 @@ function Target() {
   };
   const onMidChange = ({ target }) => setMid(target.value);
   const onTargetChange = ({ target }) => setTarget(target.value);
+
+  const onNikChange = ({ target }) => setNik(target.value);
 
   const handleGetTargetData = useCallback(() => {
     setLoading(true);
@@ -221,6 +222,10 @@ function Target() {
       });
   };
 
+  const disableDone = () => {
+    return true
+  }
+
   return (
     <div className="h-full flex flex-col py-4 px-8">
       <div className="flex items-end gap-2 pb-4">
@@ -325,7 +330,7 @@ function Target() {
                           {product}
                         </Typography>
                       </div>
-                      <div >
+                      <div>
                         <Typography color="blue-gray" className="font-normal">
                           {target} Box
                         </Typography>
@@ -365,7 +370,7 @@ function Target() {
                 }}
               >
                 <PopoverHandler>
-                  <Input label="Tanggal" onFocus={() => setShowDate(true)} value={date ? format(date, "dd MMMM yyyy") : ""} />
+                  <Input label="Tanggal" onFocus={() => setShowDate(true)} value={date ? format(date, "dd MMMM yyyy") : ""} onChange={() => {}} />
                 </PopoverHandler>
                 <PopoverContent className="z-[9999]">
                   <DayPicker
@@ -452,12 +457,15 @@ function Target() {
 
       <Dialog open={openDone} handler={handleOpenDone}>
         <DialogHeader>Target Selesai</DialogHeader>
-        <DialogBody>Apakah anda yakin ingin target sudah selesai?</DialogBody>
+        <DialogBody>
+          <div className="mb-2">Masukkan NIK untuk menyelesaikan target</div>
+          <Input label="NIK" size="lg" placeholder="example: 0084923" value={nik} onChange={onNikChange} />
+        </DialogBody>
         <DialogFooter>
           <Button variant="text" onClick={handleOpenDone} className="mr-3">
             <span>Batal</span>
           </Button>
-          <Button color="green" loading={doneLoading} onClick={handleDoneTarget}>
+          <Button color="green" loading={doneLoading} onClick={handleDoneTarget} disabled={disableDone()}>
             <span>Selesai</span>
           </Button>
         </DialogFooter>

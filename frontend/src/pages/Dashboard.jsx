@@ -12,7 +12,9 @@ function Dashboard() {
 
   const [totalProduction, setTotalProduction] = useState(0);
   const [totalMix, setTotalMix] = useState(0);
+  const [insufficientMix, setInsufficientMix] = useState(0);
   const [totalAdditionBS, setTotalAdditionBS] = useState(0);
+  const [stagnationMix, setStagnationMix] = useState(0);
   const [totalWaste, setTotalWaste] = useState(0);
   const [shortageProduction, setShortageProduction] = useState(0);
   const [grammage, setGrammage] = useState(0);
@@ -63,9 +65,31 @@ function Dashboard() {
       const averages = grammages.map((grammage) => grammage.average);
       const grammage = averages.length ? (averages.reduce((a, b) => a + b, 0) / averages.length).toFixed(2) : 0;
       setGrammage(grammage);
+
+      processInsufficientMix(grammage, totalProduction, selectedTarget.target, totalAdditionBS, totalWaste);
+      processStagnationMix(totalProduction, grammage, totalMix, totalAdditionBS, totalWaste);
     },
     [handleGetProductionData, handleGetGrammageData]
   );
+
+  const processInsufficientMix = (grammageInput, totalProductionInput, targetInput, totalAdditionBSInput, totalWasteInput) => {
+    let grammage = grammageInput / 1000;
+    let totalProduction = totalProductionInput * 72 * grammage;
+    let materialRequirements = targetInput * 72 * grammage;
+    let materialTotal = (materialRequirements - totalAdditionBSInput) - (totalProduction + totalWasteInput);
+    let insufficientMix = materialTotal / 210;
+
+    setInsufficientMix(insufficientMix.toFixed(2));
+  }
+
+  const processStagnationMix = (totalProductionInput, grammageInput, totalMixInput, totalAdditionBSInput, totalWasteInput) => {
+    let grammage = grammageInput / 1000;
+    let totalProduction = totalProductionInput * 72 * grammage;
+    let totalMix = totalMixInput * 120;
+
+    let stagnationMix = (totalMix - totalAdditionBSInput) - (totalProduction + totalWasteInput);
+    setStagnationMix(stagnationMix.toFixed(2))
+  }
 
   const handleGetTargetData = useCallback(() => {
     return fetch("/api/targets", { method: "GET" })
@@ -218,7 +242,7 @@ function Dashboard() {
             </Typography>
             <div>
               <Typography color="blue-gray" className="font-bold mt-3 text-6xl">
-                -
+                {insufficientMix}
               </Typography>
               <Typography color="blue-gray" className="font-bold inline-block mt-3 text-lg">
                 Kali
@@ -248,7 +272,7 @@ function Dashboard() {
             </Typography>
             <div>
               <Typography color="blue-gray" className="font-bold mt-3 text-6xl">
-                -
+                {stagnationMix}
               </Typography>
               <Typography color="blue-gray" className="font-bold inline-block mt-3 text-lg">
                 Kg

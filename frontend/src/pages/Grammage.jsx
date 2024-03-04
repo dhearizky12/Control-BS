@@ -57,6 +57,13 @@ function Grammage() {
 
   const onTargetChange = ({ target }) => setTempSelectedTargetId(target.value);
 
+  const scrollTableToBottom = useCallback(() => {
+    setTimeout(() => {
+      const element = document.getElementById("table-grammage");
+      element.scroll({top: element.scrollHeight, behavior: 'smooth' })
+    }, 500)
+  }, [])
+
   const handleGetGrammageData = useCallback((activeTarget) => {
     if (!activeTarget?.id) return;
 
@@ -74,16 +81,18 @@ function Grammage() {
 
               return grammage;
             })
-            .sort((a, b) => a.workingHourId - b.workingHourId)
+            .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
         );
 
         setAverage(average);
+
+        scrollTableToBottom();
       })
       .catch((error) => {
         setLoading(false);
         console.error("API Error:", error);
       });
-  }, []);
+  }, [scrollTableToBottom]);
 
   const handleGetTargetData = useCallback(() => {
     return fetch("/api/targets", { method: "GET" })
@@ -135,6 +144,7 @@ function Grammage() {
         console.error("API Error:", error);
       });
   }, []);
+  
 
   useEffect(() => {
     setOpenLoading(true);
@@ -321,7 +331,7 @@ function Grammage() {
               Aksi
             </Typography>
           </div>
-          <div className="overflow-y-auto overflow-x-hidden gutter-stable">
+          <div id="table-grammage" className="overflow-y-auto overflow-x-hidden gutter-stable">
             {grammagesData.length ? (
               grammagesData.map(({ id, shift, sample1, sample2, sample3, sample4, average, working_hour }, index) => {
                 return (
